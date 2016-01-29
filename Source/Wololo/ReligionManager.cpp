@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Wololo.h"
+#include "Town.h"
 #include "ReligionManager.h"
-
 
 // Sets default values
 AReligionManager::AReligionManager()
@@ -31,19 +31,26 @@ void AReligionManager::Tick( float DeltaTime )
 	//}
 }
 
-void AReligionManager::SpawnInitialReligions(int32 Num)
+void AReligionManager::SpawnReligionAtLocation(FVector Location, EReligionType Type)
 {
 	UWorld* World = GetWorld();
 
+	AReligion* NewReligion = (AReligion*)World->SpawnActor(ReligionClass, &Location);
+
+	NewReligion->SetNewType(Type);
+
+	AllReligions.Add(NewReligion);
+}
+
+void AReligionManager::SpawnNumberReligions(int32 Num)
+{
 	FTransform ZeroTransform;
 
 	uint8 Type = 0;
 
 	for (uint8 i = 0; i < Num; i++)
 	{
-		AReligion* NewReligion = (AReligion*) World->SpawnActor(ReligionClass, &FVector::ZeroVector);
-
-		NewReligion->SetNewType((EReligionType)Type);
+		SpawnReligionAtLocation(FVector::ZeroVector, (EReligionType)Type);
 
 		Type++;
 
@@ -51,8 +58,17 @@ void AReligionManager::SpawnInitialReligions(int32 Num)
 		{
 			Type = 0;
 		}
-
-		AllReligions.Add(NewReligion);
 	}
+}
+
+void AReligionManager::SpawnReligionInEveryTown()
+{
+	UWorld* World = GetWorld();
+
+	TSubclassOf<ATown> ClassToFind;
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ClassToFind, FoundActors);
+
+	SpawnNumberReligions(FoundActors.Num());
 }
 

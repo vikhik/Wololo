@@ -28,5 +28,11 @@ public:
 		TArray<AReligion*> AllReligions;
 
 	UFUNCTION(BlueprintCallable, Category = "Religion")
-		void SpawnInitialReligions(int32 Num);
+		void SpawnReligionAtLocation(FVector Location, EReligionType Type);
+
+	UFUNCTION(BlueprintCallable, Category = "Religion")
+		void SpawnNumberReligions(int32 Num);
+
+	UFUNCTION(BlueprintCallable, Category = "Religion")
+		void SpawnReligionInEveryTown();
 };
