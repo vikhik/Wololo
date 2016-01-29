@@ -75,6 +75,7 @@ void AReligionManager::SpawnReligionInEveryTown()
 	for (AReligion* Religion : AllReligions)
 	{
 		Religion->SetActorLocation(FoundActors[i]->GetActorLocation());
+		Religion->NumberOfFollowers = ((ATown*)FoundActors[i])->Population;
 		i++;
 
 		if (i > FoundActors.Num())

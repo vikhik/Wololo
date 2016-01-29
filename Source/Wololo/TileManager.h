@@ -4,6 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "Tile.h"
+#include "Town.h"
 #include "TileManager.generated.h"
 
 UCLASS()
@@ -36,9 +37,33 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float TownSpawnChance;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float SpawnZ;
+
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
 		void SpawnThings();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<ATile*> Tiles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<ATown*> Towns;
+
+	UFUNCTION(BlueprintCallable, Category = "Tiles")
+		void SpawnTileAtLocation(FVector Location);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<ATile> TileClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<ATown> TownClass;
+
+	UFUNCTION(BlueprintCallable, Category = "Tiles")
+		ATile* GetTileAtLocation(FVector Location);
+
+	UFUNCTION(BlueprintCallable, Category = "Tiles")
+		void SpawnTownAtTile(ATile* Tile);
+private:
+	float TileHeight;
+	float TileWidth;
 };

@@ -20,6 +20,12 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Width;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Height;
+
+	UFUNCTION(BlueprintCallable, Category = "Tiles")
+		void SetWidthAndHeight(float NewWidth, float NewHeight);
 };

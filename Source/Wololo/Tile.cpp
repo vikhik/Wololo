@@ -26,3 +26,9 @@ void ATile::Tick( float DeltaTime )
 
 }
 
+void ATile::SetWidthAndHeight(float NewWidth, float NewHeight)
+{
+	this->Width = NewWidth;
+	this->Height = NewHeight;
+}
+
