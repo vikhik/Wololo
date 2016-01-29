@@ -31,3 +31,14 @@ void AReligion::Tick( float DeltaTime )
 
 }
 
+void AReligion::SetNewType(EReligionType Type)
+{
+	for (auto influence : TypeInfluences)
+	{
+		influence = 0;
+	}
+
+	CurrentType = Type;
+
+}
+

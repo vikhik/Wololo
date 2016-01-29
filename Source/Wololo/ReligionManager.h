@@ -22,6 +22,11 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<AReligion> AllReligions;
-	
+		UClass* ReligionClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<AReligion*> AllReligions;
+
+	UFUNCTION(BlueprintCallable, Category = "Religion")
+		void SpawnInitialReligions(int32 Num);
 };

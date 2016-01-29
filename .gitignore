@@ -1,3 +1,6 @@
 Saved/
 Intermediate/
-Wololo.sdf
+*.sln
+*.sdf
+*.VC.opendb
+Build/

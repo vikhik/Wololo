@@ -37,4 +37,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		EReligionType CurrentType;
+
+	UFUNCTION(BlueprintCallable, Category = "Religion")
+		void SetNewType(EReligionType Type);
 };
