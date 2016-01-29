@@ -1,0 +1,3 @@
+1) fix up to target Structure as shown in Structure.txt
+2) Have a visual representation of each Tile's state
+3) Have Growth rules that are enacted by the Religion Manager

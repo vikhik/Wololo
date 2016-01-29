@@ -1,0 +1,14 @@
+Desired architecture::
+
+
+
+Tiles
+ - Have a population (even non-town Tiles)
+ - May have a town (needs a pointer!)
+ - Need a function which returns 
+ 	how much of the population belongs to each religion (don't need to be strict, overlap is ok)
+ - thus, needs a structure to know either ratio or absolute which pop belongs to which religion
+ 
+Religion
+ - ReligionManager needs to ask TileManager for all tiles, and update the Followers of each Religion (on Tick)
+
