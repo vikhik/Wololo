@@ -4,6 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "Religion.h"
+#include "Town.h"
 #include "ReligionManager.generated.h"
 
 UCLASS()
@@ -19,10 +20,13 @@ public:
 	virtual void BeginPlay() override;
 	
 	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UClass* ReligionClass;
+		TSubclassOf<ATown> TownClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<AReligion> ReligionClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<AReligion*> AllReligions;

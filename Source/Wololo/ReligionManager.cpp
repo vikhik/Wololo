@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Wololo.h"
-#include "Town.h"
 #include "ReligionManager.h"
 
 // Sets default values
@@ -11,6 +10,7 @@ AReligionManager::AReligionManager()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ReligionClass = AReligion::StaticClass();
+	TownClass = ATown::StaticClass();
 }
 
 // Called when the game starts or when spawned
@@ -65,10 +65,20 @@ void AReligionManager::SpawnReligionInEveryTown()
 {
 	UWorld* World = GetWorld();
 
-	TSubclassOf<ATown> ClassToFind;
 	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ClassToFind, FoundActors);
+	UGameplayStatics::GetAllActorsOfClass(World, TownClass, FoundActors);
 
 	SpawnNumberReligions(FoundActors.Num());
+
+	int i = 0;
+
+	for (AReligion* Religion : AllReligions)
+	{
+		Religion->SetActorLocation(FoundActors[i]->GetActorLocation());
+		i++;
+
+		if (i > FoundActors.Num())
+			i = 0;
+	}
 }
 
