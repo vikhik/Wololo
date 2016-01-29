@@ -52,7 +52,7 @@ float ATile::GetReligiousPercentage(AReligion* Religion)
 	if (GetPopulation() == 0)
 		return 0;
 
-	return GetPopulationOfReligion(Religion) / GetPopulation();
+	return (float)GetPopulationOfReligion(Religion) / (float)GetPopulation();
 }
 
 void ATile::SetWidthAndHeight(float NewWidth, float NewHeight)

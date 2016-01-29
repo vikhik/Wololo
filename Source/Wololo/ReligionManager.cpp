@@ -88,7 +88,7 @@ void AReligionManager::SpawnReligionInEveryTown()
 		Religion->NumberOfFollowers = RandomPop; // TODO proper updating
 
 		i++;
-		if (i > TilesWithTowns.Num())
+		if (i >= TilesWithTowns.Num())
 			return; // ERROR LATER, EXIT FOR NOW
 	}
 }
