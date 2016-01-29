@@ -4,7 +4,9 @@
 #include "ReligionManager.h"
 
 // Sets default values
-AReligionManager::AReligionManager()
+AReligionManager::AReligionManager() :
+	BasePopulation(250),
+	PopulationVariance(100)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -18,17 +20,21 @@ void AReligionManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (!TileManager)
+	{
+		TSubclassOf<ATileManager> ClassToFind = ATileManager::StaticClass();
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ClassToFind, FoundActors);
+
+		if (FoundActors.Num() > 0)
+			TileManager = (ATileManager*)FoundActors[0];
+	}
 }
 
 // Called every frame
 void AReligionManager::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
-	//for (auto Religion : AllReligions)
-	//{
-
-	//}
 }
 
 void AReligionManager::SpawnReligionAtLocation(FVector Location, EReligionType Type)
@@ -65,21 +71,25 @@ void AReligionManager::SpawnReligionInEveryTown()
 {
 	UWorld* World = GetWorld();
 
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(World, TownClass, FoundActors);
+	TArray<ATile*> TilesWithTowns = TileManager->TilesWithTowns;
 
-	SpawnNumberReligions(FoundActors.Num());
+	SpawnNumberReligions(TilesWithTowns.Num());
 
 	int i = 0;
 
 	for (AReligion* Religion : AllReligions)
 	{
-		Religion->SetActorLocation(FoundActors[i]->GetActorLocation());
-		Religion->NumberOfFollowers = ((ATown*)FoundActors[i])->Population;
-		i++;
+		Religion->SetActorLocation(TilesWithTowns[i]->GetActorLocation());
 
-		if (i > FoundActors.Num())
-			i = 0;
+		int32 RandomPop = BasePopulation + FMath::FRandRange(-PopulationVariance, PopulationVariance);
+
+		((ATile*)TilesWithTowns[i])->AddPopulation(Religion, RandomPop);
+
+		Religion->NumberOfFollowers = RandomPop; // TODO proper updating
+
+		i++;
+		if (i > TilesWithTowns.Num())
+			return; // ERROR LATER, EXIT FOR NOW
 	}
 }
 

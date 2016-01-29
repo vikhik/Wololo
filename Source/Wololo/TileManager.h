@@ -41,16 +41,16 @@ public:
 		float SpawnZ;
 
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
-		void SpawnThings();
+		void SpawnTilesAndTowns();
+
+	UFUNCTION(BlueprintCallable, Category = "Tiles")
+		ATile* GetTileAtLocation(FVector Location);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<ATile*> Tiles;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<ATown*> Towns;
-
-	UFUNCTION(BlueprintCallable, Category = "Tiles")
-		void SpawnTileAtLocation(FVector Location);
+		TArray<ATile*> TilesWithTowns;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<ATile> TileClass;
@@ -59,10 +59,10 @@ public:
 		TSubclassOf<ATown> TownClass;
 
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
-		ATile* GetTileAtLocation(FVector Location);
+		ATile* SpawnTileAtLocation(FVector Location);
 
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
-		void SpawnTownAtTile(ATile* Tile);
+		ATown* SpawnTownAtTile(ATile* Tile);
 private:
 	float TileHeight;
 	float TileWidth;

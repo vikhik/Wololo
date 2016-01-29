@@ -26,9 +26,87 @@ void ATile::Tick( float DeltaTime )
 
 }
 
+TArray<AReligion*> ATile::GetReligions()
+{
+	TArray<AReligion*> Religions;
+
+	for (auto ReligiousPopulation : Population)
+	{
+		Religions.Add(ReligiousPopulation.Key);
+	}
+
+	if (Town)
+	{
+		for (auto ReligiousPopulation : Town->Population)
+		{
+			if (!Religions.Contains(ReligiousPopulation.Key))
+				Religions.Add(ReligiousPopulation.Key);
+		}
+	}
+
+	return Religions;
+}
+
+float ATile::GetReligiousPercentage(AReligion* Religion)
+{
+	if (GetPopulation() == 0)
+		return 0;
+
+	return GetPopulationOfReligion(Religion) / GetPopulation();
+}
+
 void ATile::SetWidthAndHeight(float NewWidth, float NewHeight)
 {
 	this->Width = NewWidth;
 	this->Height = NewHeight;
+}
+
+int32 ATile::GetPopulation()
+{
+	int32 BasePopulation = 0;
+	for (auto ReligiousPopulation : Population)
+		BasePopulation += ReligiousPopulation.Value;
+
+	if (Town)
+		return BasePopulation + Town->GetPopulation();
+	else
+		return BasePopulation;
+}
+
+int32 ATile::GetPopulationOfReligion(AReligion* Religion)
+{
+	int32 Pop = 0;
+
+	if (Town)
+	{
+		Pop += Town->GetPopulationOfReligion(Religion);
+	}
+	else
+	{
+		if (Population.Contains(Religion))
+			Pop += Population[Religion];
+	}
+
+	return Pop;
+}
+
+void ATile::AddPopulation(AReligion* Religion, int32 AddedPop)
+{
+	if (Town)
+	{
+		if (!Town->Population.Contains(Religion))
+		{
+			Town->Population.Add(Religion, 0);
+		}
+
+		Town->Population[Religion] += AddedPop;
+	}
+	else
+	{
+		if (!Population.Contains(Religion))
+			Population.Add(Religion, 0);
+
+		Population[Religion] += AddedPop;
+	}
 }
 

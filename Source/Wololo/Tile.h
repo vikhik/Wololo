@@ -3,6 +3,8 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "Town.h"
+#include "Religion.h"
 #include "Tile.generated.h"
 
 UCLASS()
@@ -26,6 +28,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Height;
 
+	UFUNCTION(BlueprintPure, Category = "Tiles")
+		TArray<AReligion*> GetReligions();
+
+	UFUNCTION(BlueprintPure, Category = "Tiles")
+		float GetReligiousPercentage(AReligion* Religion);
+
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
 		void SetWidthAndHeight(float NewWidth, float NewHeight);
+
+	UFUNCTION(BlueprintPure, Category = "Tiles")
+		int32 GetPopulation();
+
+	UFUNCTION(BlueprintPure, Category = "Tiles")
+		int32 GetPopulationOfReligion(AReligion* Religion);
+
+	UFUNCTION(BlueprintCallable, Category = "Tiles")
+		void AddPopulation(AReligion* Religion, int32 AddedPop);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		ATown* Town;
+
+	TMap<AReligion*, int32> Population;
 };

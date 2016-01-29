@@ -33,7 +33,7 @@ void ATileManager::Tick( float DeltaTime )
 
 }
 
-void ATileManager::SpawnThings()
+void ATileManager::SpawnTilesAndTowns()
 {
 	TileHeight = Height / TilesHigh; // 50
 	TileWidth = Width / TilesWide; // 50
@@ -47,19 +47,19 @@ void ATileManager::SpawnThings()
 		{
 			FVector Pos = FVector(x, y, SpawnZ);
 
-			SpawnTileAtLocation(Pos);
+			ATile* NewTile = SpawnTileAtLocation(Pos);
 
 			float DieRoll = FMath::FRand();
 
 			if (DieRoll < TownSpawnChance)
 			{
-				SpawnTownAtTile(GetTileAtLocation(Pos));
+				NewTile->Town = SpawnTownAtTile(NewTile);
 			}
 		}
 	}
 }
 
-void ATileManager::SpawnTileAtLocation(FVector Location)
+ATile* ATileManager::SpawnTileAtLocation(FVector Location)
 {
 	UWorld* World = GetWorld();
 
@@ -68,6 +68,8 @@ void ATileManager::SpawnTileAtLocation(FVector Location)
 	NewTile->SetWidthAndHeight(TileWidth, TileHeight);
 
 	Tiles.Add(NewTile);
+
+	return NewTile;
 }
 
 ATile* ATileManager::GetTileAtLocation(FVector Location)
@@ -88,7 +90,7 @@ ATile* ATileManager::GetTileAtLocation(FVector Location)
 	return nullptr;
 }
 
-void ATileManager::SpawnTownAtTile(ATile* Tile)
+ATown* ATileManager::SpawnTownAtTile(ATile* Tile)
 {
 	UWorld* World = GetWorld();
 
@@ -96,8 +98,8 @@ void ATileManager::SpawnTownAtTile(ATile* Tile)
 
 	ATown* NewTown = (ATown*)World->SpawnActor(TownClass, &Loc);
 
-	NewTown->Population = 500 + FMath::FRandRange(-200, 200);
+	TilesWithTowns.Add(Tile);
 
-	Towns.Add(NewTown);
+	return NewTown;
 }
 

@@ -26,3 +26,22 @@ void ATown::Tick( float DeltaTime )
 
 }
 
+int32 ATown::GetPopulation()
+{
+	int32 BasePopulation = 0;
+	for (auto ReligiousPopulation : Population)
+		BasePopulation += ReligiousPopulation.Value;
+
+	return BasePopulation;
+}
+
+int32 ATown::GetPopulationOfReligion(AReligion* Religion)
+{
+	int32 Pop = 0;
+
+	if (Population.Contains(Religion))
+		Pop += Population[Religion];
+
+	return Pop;
+}
+

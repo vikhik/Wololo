@@ -4,7 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "Religion.h"
-#include "Town.h"
+#include "TileManager.h"
 #include "ReligionManager.generated.h"
 
 UCLASS()
@@ -23,6 +23,12 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 BasePopulation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 PopulationVariance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<ATown> TownClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -39,4 +45,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Religion")
 		void SpawnReligionInEveryTown();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		ATileManager* TileManager;
 };

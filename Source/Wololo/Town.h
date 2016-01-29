@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "Religion.h"
 #include "Town.generated.h"
 
 UCLASS()
@@ -20,7 +21,12 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 Population;
+	UFUNCTION(BlueprintCallable, Category = "Town")
+		int32 GetPopulation();
+
+	UFUNCTION(BlueprintPure, Category = "Tiles")
+		int32 GetPopulationOfReligion(AReligion* Religion);
+
+	TMap<AReligion*, int32> Population;
 	
 };
