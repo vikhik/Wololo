@@ -87,6 +87,15 @@ void AReligionManager::SpawnReligionInEveryTown()
 
 		Religion->NumberOfFollowers = RandomPop; // TODO proper updating
 
+		if (i >= Colors.Num())
+		{
+			FVector RandVec = FMath::VRand();
+			FColor NewColour = FLinearColor(RandVec).ToFColor(false);
+			Colors.Add(NewColour);
+		}
+		
+		Religion->Color = Colors[i];
+
 		i++;
 		if (i >= TilesWithTowns.Num())
 			return; // ERROR LATER, EXIT FOR NOW

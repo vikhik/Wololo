@@ -23,6 +23,9 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FColor> Colors;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 BasePopulation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
