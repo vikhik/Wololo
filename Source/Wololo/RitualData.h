@@ -4,7 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "RitualData.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FRitualData
 {
 	GENERATED_BODY()
@@ -19,29 +19,56 @@ struct FRitualData
 		float SpreadRate = 0.2f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float GrowthRate = 0.1f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float ConflictOffense = 0.2f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float ConflictDefense = 0.1f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float GrowthRate = 0.1f;
+		float ConflictConversion = 0.1f;
 
 	FRitualData(
 		float SpreadMinPercentage = 0.8f,
 		int32 SpreadMinPop = 200,
 		float SpreadRatePercentage = 0.2f,
 		float GrowthRatePercentage = 0.1f,
-		float ConflictOffensePercentage = 0.2f,
-		float ConflictDefensePercentage = 0.1f) :
+		float ConflictOffensePercentage = 0.1f,
+		float ConflictDefensePercentage = 0.1f,
+		float ConflictConversionPercentage = 0.1f) :
 		SpreadMinimumPercentage(SpreadMinPercentage),
 		SpreadMinimumPopulation(SpreadMinPop),
 		SpreadRate(SpreadRatePercentage),
 		GrowthRate(GrowthRatePercentage),
 		ConflictOffense(ConflictOffensePercentage),
-		ConflictDefense(ConflictDefensePercentage)
+		ConflictDefense(ConflictDefensePercentage),
+		ConflictConversion(ConflictConversionPercentage)
 	{
 
+	}
+
+	void Zero()
+	{
+		SpreadMinimumPercentage = 0;
+		SpreadMinimumPopulation = 0;
+		SpreadRate = 0;
+		GrowthRate = 0;
+		ConflictOffense = 0;
+		ConflictDefense = 0;
+		ConflictConversion = 0;
+	}
+
+	void Add(FRitualData RitualData, float Influence)
+	{
+		SpreadMinimumPercentage = RitualData.SpreadMinimumPercentage* Influence;
+		SpreadMinimumPopulation = RitualData.SpreadMinimumPopulation* Influence;
+		SpreadRate				= RitualData.SpreadRate				* Influence;
+		GrowthRate				= RitualData.GrowthRate				* Influence;
+		ConflictOffense			= RitualData.ConflictOffense		* Influence;
+		ConflictDefense			= RitualData.ConflictDefense		* Influence;
+		ConflictConversion		= RitualData.ConflictConversion		* Influence;
 	}
 };
 

@@ -10,7 +10,7 @@ AReligion::AReligion()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	NumberOfFollowers = 1000;
+	Followers = 1000;
 }
 
 // Called when the game starts or when spawned
@@ -25,102 +25,97 @@ void AReligion::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 }
 
-float AReligion::GetSpreadMinimumPercentage()
+float AReligion::GetSpreadMinimumPercentage() const
 {
-	float SpreadMinimumPercentage = 0.f;
-
-	for (auto Influence : RitualInfluences)
-	{
-		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
-
-		SpreadMinimumPercentage += RitualData.SpreadMinimumPercentage * Influence.Value;
-	}
-
-	return SpreadMinimumPercentage;
+	return ReligiousRitual.SpreadMinimumPercentage;
 }
 
-int32 AReligion::GetSpreadMinimumPopulation()
+int32 AReligion::GetSpreadMinimumPopulation() const
 {
-	int32 SpreadMinimumPopulation = 0;
-
-	for (auto Influence : RitualInfluences)
-	{
-		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
-
-		SpreadMinimumPopulation += RitualData.SpreadMinimumPopulation * Influence.Value;
-	}
-
-	return SpreadMinimumPopulation;
+	return ReligiousRitual.SpreadMinimumPopulation;
 }
 
-float AReligion::GetSpreadRate()
+float AReligion::GetSpreadRate() const
 {
-	float SpreadRate = 0.f;
-
-	for (auto Influence : RitualInfluences)
-	{
-		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
-
-		SpreadRate += RitualData.SpreadRate * Influence.Value;
-	}
-
-	return SpreadRate;
+	return ReligiousRitual.SpreadRate;
 }
 
-float AReligion::GetConflictOffense()
+float AReligion::GetGrowthRate() const
 {
-	float ConflictOffense = 0.f;
-
-	for (auto Influence : RitualInfluences)
-	{
-		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
-
-		ConflictOffense += RitualData.ConflictOffense * Influence.Value;
-	}
-
-	return ConflictOffense;
+	return ReligiousRitual.GrowthRate;
 }
 
-float AReligion::GetConflictDefense()
+float AReligion::GetConflictOffense() const
 {
-	float ConflictDefense = 0.f;
-
-	for (auto Influence : RitualInfluences)
-	{
-		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
-
-		ConflictDefense += RitualData.ConflictDefense * Influence.Value;
-	}
-
-	return ConflictDefense;
+	return ReligiousRitual.ConflictOffense;
 }
 
-float AReligion::GetGrowthRate()
+float AReligion::GetConflictDefense() const
 {
-	float GrowthRate = 0.f;
-
-	for (auto Influence : RitualInfluences)
-	{
-		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
-
-		GrowthRate += RitualData.GrowthRate * Influence.Value;
-	}
-
-	return GrowthRate;
+	return ReligiousRitual.ConflictDefense;
 }
 
-void AReligion::SetNewType(ERitualType Type)
+float AReligion::GetConflictConversion() const
+{
+	return ReligiousRitual.ConflictConversion;
+}
+
+float AReligion::GetAggressiveInfluence() const
+{
+	if (!RitualInfluences.Contains(ERitualType::Aggressive))
+		return 0;
+	return RitualInfluences[ERitualType::Aggressive];
+}
+
+float AReligion::GetCommunalInfluence() const
+{
+	if (!RitualInfluences.Contains(ERitualType::Communal))
+		return 0;
+	return RitualInfluences[ERitualType::Communal];
+}
+
+float AReligion::GetMeditativeInfluence() const
+{
+	if (!RitualInfluences.Contains(ERitualType::Meditiative))
+		return 0;
+	return RitualInfluences[ERitualType::Meditiative];
+}
+
+void AReligion::ShiftToNewRitualType(ERitualType Type, float Amount /*= 0.1f*/)
 {
 	for (auto Influence : RitualInfluences)
 	{
-		Influence.Value = 0.f;
+		Influence.Value *= (1.0 - Amount); // reduce all influences by the %
 	}
-
-	CurrentType = Type;
 
 	if (!RitualInfluences.Contains(Type))
 		RitualInfluences.Add(Type);
 
+	RitualInfluences[Type] += Amount; // Should keep us at 1.0 overall influence
+
+	UpdateRitualData();
+}
+
+void AReligion::SetNewType(ERitualType Type)
+{
+	RitualInfluences.Empty();
+
+	RitualInfluences.Add(Type);
+
 	RitualInfluences[Type] = 1.0f;
+
+	UpdateRitualData();
+}
+
+void AReligion::UpdateRitualData()
+{
+	ReligiousRitual.Zero();
+
+	for (auto Influence : RitualInfluences)
+	{
+		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
+
+		ReligiousRitual.Add(RitualData, Influence.Value);
+	}
 }
 

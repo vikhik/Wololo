@@ -24,39 +24,56 @@ public:
 
 	// TRAIT VALUES
 
-	UFUNCTION(BlueprintCallable, Category = "Religion")
-		float GetSpreadMinimumPercentage();
+	UFUNCTION(BlueprintPure, Category = "Religion")
+		float GetSpreadMinimumPercentage() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Religion")
-		int32 GetSpreadMinimumPopulation();
+	UFUNCTION(BlueprintPure, Category = "Religion")
+		int32 GetSpreadMinimumPopulation() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Religion")
-		float GetSpreadRate();
+	UFUNCTION(BlueprintPure, Category = "Religion")
+		float GetSpreadRate() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Religion")
-		float GetConflictOffense();
+	UFUNCTION(BlueprintPure, Category = "Religion")
+		float GetGrowthRate() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Religion")
-		float GetConflictDefense();
+	UFUNCTION(BlueprintPure, Category = "Religion")
+		float GetConflictOffense() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Religion")
-		float GetGrowthRate();
+	UFUNCTION(BlueprintPure, Category = "Religion")
+		float GetConflictDefense() const;
 
+	UFUNCTION(BlueprintPure, Category = "Religion")
+		float GetConflictConversion() const;
 
 	// Other stuff
 
 	TMap<ERitualType, float> RitualInfluences; // 0.0 - 1.0
+
+	UFUNCTION(BlueprintPure, Category = "Religion")
+		float GetAggressiveInfluence() const;
+
+	UFUNCTION(BlueprintPure, Category = "Religion")
+		float GetCommunalInfluence() const;
+
+	UFUNCTION(BlueprintPure, Category = "Religion")
+		float GetMeditativeInfluence() const;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FColor Color;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 NumberOfFollowers;
+		int32 Followers;
 
+	// Slowly shift to new Ritual Type
+	UFUNCTION(BlueprintCallable, Category = "Religion")
+		void ShiftToNewRitualType(ERitualType Type, float Amount = 0.1f);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		ERitualType CurrentType;
-
+	// COMPLETELY OVERRIDE EXISTING RITUALS
 	UFUNCTION(BlueprintCallable, Category = "Religion")
 		void SetNewType(ERitualType Type);
+
+	void UpdateRitualData();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FRitualData ReligiousRitual;
 };

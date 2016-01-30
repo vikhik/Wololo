@@ -102,8 +102,6 @@ void AReligionManager::SpawnReligionInEveryTown()
 
 		((ATile*)TilesWithTowns[i])->AddPopulation(Religion, RandomPop);
 
-		Religion->NumberOfFollowers = RandomPop; // TODO proper updating
-
 		if (i >= Colors.Num())
 		{
 			Colors.Add(GenerateNewColor());
@@ -140,6 +138,7 @@ void AReligionManager::RunUpdate()
 			if (SpreadPop > 0) // Only spread if spreadpop is higher than existing pop
 			{
 				RandomTile->AddPopulation(SpreadReligion, SpreadPop);
+				Tile->AddPopulation(SpreadReligion, -SpreadPop); // MOVE the population
 			}
 		}
 	}
@@ -167,6 +166,8 @@ void AReligionManager::RunUpdate()
 
 					if (ReligiousPopulation != OtherPopulation)
 					{
+						// Offense vs Defense
+
 						int32 PotentialDeaths = ReligiousPopulation.Value * ReligiousPopulation.Key->GetConflictOffense();
 						int32 SavedLives = OtherPopulation.Value * OtherPopulation.Key->GetConflictDefense();
 
@@ -183,6 +184,27 @@ void AReligionManager::RunUpdate()
 
 							print("Deaths : " + FString::FromInt(ActualDeaths));
 						}
+
+						// Conversion
+
+						int32 PotentialConverts = OtherPopulation.Value * ReligiousPopulation.Key->GetConflictConversion();
+
+						if (PotentialConverts > 0)
+						{
+							if (!PopulationChange.Contains(ReligiousPopulation.Key))
+							{
+								PopulationChange.Add(ReligiousPopulation.Key);
+							}
+
+							if (!PopulationChange.Contains(OtherPopulation.Key))
+							{
+								PopulationChange.Add(OtherPopulation.Key);
+							}
+
+							PopulationChange[ReligiousPopulation.Key] += PotentialConverts;
+							PopulationChange[OtherPopulation.Key] -= PotentialConverts;
+						}
+
 					}
 				}
 			}
@@ -194,10 +216,26 @@ void AReligionManager::RunUpdate()
 	{
 		for (auto ReligiousPopulation : Tile->Population)
 		{
+			if (ReligiousPopulation.Key->Color == FColor::FromHex("0000A6FF"))
+			{
+				Tile->AddPopulation(ReligiousPopulation.Key, ReligiousPopulation.Value * ReligiousPopulation.Key->GetGrowthRate());
+			}
+
 			if (ReligiousPopulation.Value < 5000)
 			{
 				Tile->AddPopulation(ReligiousPopulation.Key, ReligiousPopulation.Value * ReligiousPopulation.Key->GetGrowthRate());
 			}
+		}
+	}
+
+	// 4. Housekeeping
+	for (AReligion* Religion : AllReligions)
+	{
+		Religion->Followers = 0;
+
+		for (ATile* Tile : TileManager->Tiles)
+		{
+			Religion->Followers += Tile->GetPopulationOfReligion(Religion);
 		}
 	}
 }
