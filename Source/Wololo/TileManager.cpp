@@ -3,7 +3,6 @@
 #include "Wololo.h"
 #include "TileManager.h"
 
-
 // Sets default values
 ATileManager::ATileManager() : 
 	TownSpawnChance(0.1f),
@@ -39,7 +38,7 @@ void ATileManager::SpawnTilesAndTowns()
 	TileWidth = Width / TilesWide; // 100
 
 	MaxY = (TileHeight * TilesHigh * 0.5) - TileHeight * 0.5; // 1450
-	MaxX = (TileWidth * TilesWide * 0.5) - TileHeight * 0.5; // 1450
+	MaxX = (TileWidth * TilesWide * 0.5) - TileWidth * 0.5; // 1450
 
 	for (float y = -MaxY; y <= MaxY; y += TileHeight) // [-1450, 1450]
 	{
@@ -110,22 +109,44 @@ ATile* ATileManager::SpawnTileAtLocation(FVector Location)
 	return NewTile;
 }
 
+ATileManager::TileIndexPair ATileManager::GetTileIndex(FVector Location)
+{
+  ATileManager::TileIndexPair iPair;
+
+  // If out of bounds return null
+  if (Location.X < -MaxX || Location.X > MaxX ||
+      Location.Y < -MaxY || Location.Y > MaxY)
+    {
+      iPair.indexX = -1;
+      iPair.indexY = -1;
+    }
+  else
+    {
+      float newX = Location.X + MaxX;
+      newX /= TileWidth;
+      //newX -= 0.5f;
+      iPair.indexX = (int32)newX;
+
+      float newY = Location.Y + MaxY;
+      newY /= TileHeight;
+      //newY -= 0.5f;
+      iPair.indexY = (int32)newY;
+    }
+  return iPair;
+}
+
 ATile* ATileManager::GetTileAtLocation(FVector Location)
 {
-	for (ATile* Tile : Tiles)
-	{
-		FVector TileLocation = Tile->GetActorLocation();
+  ATileManager::TileIndexPair iPair = GetTileIndex(Location);
+  // If out of bounds return null
+  if (iPair.indexX == -1 || iPair.indexY == -1)
+    return nullptr;
 
-		float xdiff = FMath::Abs(TileLocation.X - Location.X);
-		float ydiff = FMath::Abs(TileLocation.Y - Location.Y);
-
-		if (xdiff < Tile->Width && ydiff < Tile->Height)
-		{
-			return Tile;
-		}
-	}
-
-	return nullptr;
+  int32 tileIndex = iPair.indexY * TilesWide + iPair.indexX;
+  if (tileIndex > Tiles.Num() || tileIndex < 0)
+    return nullptr;
+  
+  return Tiles[tileIndex];
 }
 
 TArray<ATile*> ATileManager::GetAdjacentTiles(ATile* Tile)

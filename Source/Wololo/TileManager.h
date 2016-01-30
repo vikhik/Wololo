@@ -75,4 +75,12 @@ private:
 
 	float MaxY;
 	float MaxX;
+
+	struct TileIndexPair
+	{
+	  int32 indexX;
+	  int32 indexY;
+	};
+	TileIndexPair GetTileIndex(FVector Location);
+ 
 };

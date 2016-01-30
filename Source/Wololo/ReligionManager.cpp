@@ -118,7 +118,7 @@ void AReligionManager::SpawnReligionInEveryTown()
 
 void AReligionManager::RunUpdate()
 {
-	bool DoDebug = true;
+	bool DoDebug = false;
 	for (AReligion* Religion : AllReligions)
 	{
 		ATile* TargetTile;
