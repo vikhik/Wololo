@@ -156,10 +156,35 @@ void AReligionManager::RunUpdate()
 				return PopA < PopB;
 			});
 
+			TMap<AReligion*, int32> PopulationChange;
+
 			for (auto ReligiousPopulation : Tile->Population)
 			{
-				// for each other pop
+				for (auto OtherPopulation : Tile->Population)
+				{
+					// for each other pop
 					// our pop * offense - their pop * defense = their pop change (max 0)
+
+					if (ReligiousPopulation != OtherPopulation)
+					{
+						int32 PotentialDeaths = ReligiousPopulation.Value * ReligiousPopulation.Key->GetConflictOffense();
+						int32 SavedLives = OtherPopulation.Value * OtherPopulation.Key->GetConflictDefense();
+
+						int32 ActualDeaths = PotentialDeaths - SavedLives;
+
+						if (ActualDeaths > 0)
+						{
+							if (!PopulationChange.Contains(OtherPopulation.Key))
+							{
+								PopulationChange.Add(OtherPopulation.Key);
+							}
+
+							PopulationChange[OtherPopulation.Key] -= ActualDeaths;
+
+							print("Deaths : " + FString::FromInt(ActualDeaths));
+						}
+					}
+				}
 			}
 		}
 	}

@@ -17,14 +17,12 @@ AReligion::AReligion()
 void AReligion::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void AReligion::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
 }
 
 float AReligion::GetSpreadMinimumPercentage()

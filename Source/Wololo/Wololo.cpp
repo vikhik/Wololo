@@ -6,4 +6,3 @@
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Wololo, "Wololo" );
 
 DEFINE_LOG_CATEGORY(LogWololo)
- 
