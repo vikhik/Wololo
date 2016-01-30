@@ -32,6 +32,9 @@ public:
 		bool HasConflictingReligion(AReligion* Religion);
 
 	UFUNCTION(BlueprintPure, Category = "Tiles")
+		bool HasPotentialTargetNeighbour(AReligion* Religion);
+
+	UFUNCTION(BlueprintPure, Category = "Tiles")
 		bool IsEmpty();
 
 	UFUNCTION(BlueprintPure, Category = "Tiles")
@@ -59,9 +62,13 @@ public:
 
 	void Attack(AReligion* Religion, AReligion* TargetReligion);
 	void Convert(AReligion* Religion);
-	void MovePopulation(ATile* EnemyTile, AReligion* Religion, float Ratio);
+	void MovePopulation(ATile* EnemyTile, AReligion* Religion, float Ratio, int32 KeepAtLeast);
 	void Grow(AReligion* Religion);
 	static float ConversionRate;
+
+	TArray<ATile*> Neighbours;
+
+	ATile* CurrentTarget;
 private:
 	TMap<AReligion*, int32> Population;
 };

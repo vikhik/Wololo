@@ -30,8 +30,9 @@ float AReligion::GetAttackRate() const
 	switch (GetHighestRitualType())
 	{
 	case ERitualType::Aggressive:
-	case ERitualType::Communal:
 		return 2.f / 3.f;
+	case ERitualType::Communal:
+		return 1.f / 3.f;
 	case ERitualType::Meditiative:
 		return 0;
 	}
@@ -44,15 +45,38 @@ float AReligion::GetMoveRate() const
 	{
 	case ERitualType::Aggressive:
 	case ERitualType::Communal:
-		return 1.f / 2.f;
+		return 2.f / 3.f;
 	case ERitualType::Meditiative:
 		return 1.f / 3.f;
 	}
 	return 1.f / 2.f;
 }
 
+float AReligion::GetMoveKeep() const
+{
+	switch (GetHighestRitualType())
+	{
+	case ERitualType::Aggressive:
+		return 100;
+	case ERitualType::Communal:
+		return 50;
+	case ERitualType::Meditiative:
+		return 300;
+	}
+	return 200;
+}
+
 float AReligion::GetGrowthRate() const
 {
+	switch (GetHighestRitualType())
+	{
+	case ERitualType::Meditiative:
+		return 1.f / 10.f;
+	case ERitualType::Aggressive:
+		return 1.f / 11.f;
+	case ERitualType::Communal:
+		return 1.f / 12.f;
+	}
 	return 1.f / 10.f;
 }
 

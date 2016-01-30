@@ -151,6 +151,9 @@ ATile* ATileManager::GetTileAtLocation(FVector Location)
 
 TArray<ATile*> ATileManager::GetAdjacentTiles(ATile* Tile)
 {
+	if (Tile->Neighbours.Num() > 0)
+		return Tile->Neighbours;
+
 	TArray<ATile*> Tiles;
 
 	FVector Location = Tile->GetActorLocation();
@@ -183,6 +186,8 @@ TArray<ATile*> ATileManager::GetAdjacentTiles(ATile* Tile)
 		AdjustedLocation.Y += TileHeight;
 		Tiles.Add(GetTileAtLocation(AdjustedLocation));
 	}
+
+	Tile->Neighbours = Tiles;
 
 	return Tiles;
 }

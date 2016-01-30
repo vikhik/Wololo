@@ -30,6 +30,9 @@ public:
 		float GetMoveRate() const;
 
 	UFUNCTION(BlueprintPure, Category = "Religion")
+		float GetMoveKeep() const;
+
+	UFUNCTION(BlueprintPure, Category = "Religion")
 		float GetGrowthRate() const;
 
 	UFUNCTION(BlueprintPure, Category = "Religion")
@@ -65,6 +68,9 @@ public:
 		void SetNewType(ERitualType Type);
 
 	void UpdateRitualData();
+
+	TSet<AActor*> OwnedTiles;
+	TSet<AActor*> BorderTiles;
 
 private:
 	void CleanUpInfluences();

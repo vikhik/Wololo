@@ -3,7 +3,7 @@
 #include "Wololo.h"
 #include "Tile.h"
 
-float ATile::ConversionRate = 1 / 3;
+float ATile::ConversionRate = 1 / 2;
 
 // Sets default values
 ATile::ATile()
@@ -35,6 +35,24 @@ bool ATile::HasConflictingReligion(AReligion* Religion)
 	{
 		if (OtherReligion != Religion)
 			return true;
+	}
+
+	return false;
+}
+
+bool ATile::HasPotentialTargetNeighbour(AReligion* Religion)
+{
+	for (auto Tile : Neighbours)
+	{
+		if (Tile->HasConflictingReligion(Religion))
+		{
+			return true;
+		}
+
+		if (Tile->GetPopulationOfReligion(Religion) == 0)
+		{
+			return true;
+		}
 	}
 
 	return false;
@@ -95,10 +113,20 @@ TMap<AReligion*, int32> ATile::GetPopulationByReligion()
 
 void ATile::Attack(AReligion* Religion, AReligion* TargetReligion)
 {
-	int32 Attackers = GetPopulationOfReligion(Religion);
-	int32 Defenders = GetPopulationOfReligion(TargetReligion);
+	int32 AttackerStrength = GetPopulationOfReligion(Religion);
+	int32 DefenderStrength = GetPopulationOfReligion(TargetReligion);
 
-	int32 Deaths = FMath::Min(Attackers, Defenders);
+	if (Religion->GetHighestRitualType() == ERitualType::Aggressive)
+	{
+		AttackerStrength *= 2;
+	}
+
+	if (TargetReligion->GetHighestRitualType() == ERitualType::Meditiative)
+	{
+		DefenderStrength *= 2;
+	}
+
+	int32 Deaths = FMath::Min(AttackerStrength, DefenderStrength);
 
 	AddPopulation(Religion, -Deaths);
 	AddPopulation(TargetReligion, -Deaths);
@@ -116,14 +144,17 @@ void ATile::Convert(AReligion* Religion)
 	}
 }
 
-void ATile::MovePopulation(ATile* TargetTile, AReligion* Religion, float Ratio)
+void ATile::MovePopulation(ATile* EnemyTile, AReligion* Religion, float Ratio, int32 KeepAtLeast)
 {
 	int32 TotalPop = GetPopulationOfReligion(Religion);
 
 	int32 Segment = TotalPop * Ratio;
 
+	if (TotalPop - Segment < KeepAtLeast)
+		return;
+
 	AddPopulation(Religion, -Segment);
-	TargetTile->AddPopulation(Religion, Segment);
+	EnemyTile->AddPopulation(Religion, Segment);
 }
 
 void ATile::Grow(AReligion* Religion)

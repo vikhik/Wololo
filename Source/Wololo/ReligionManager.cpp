@@ -15,11 +15,11 @@ AReligionManager::AReligionManager() :
 	TownClass = ATown::StaticClass();
 
 	Colors.Add(FColor::FromHex("0000A6"));
-	Colors.Add(FColor::FromHex("FFFF00"));
+	Colors.Add(FColor::FromHex("008941"));
 	Colors.Add(FColor::FromHex("1CE6FF"));
+	Colors.Add(FColor::FromHex("FFFF00"));
 	Colors.Add(FColor::FromHex("FF34FF"));
 	Colors.Add(FColor::FromHex("FF4A46"));
-	Colors.Add(FColor::FromHex("008941"));
 	Colors.Add(FColor::FromHex("006FA6"));
 	Colors.Add(FColor::FromHex("A30059"));
 	Colors.Add(FColor::FromHex("7A4900"));
@@ -135,44 +135,58 @@ void AReligionManager::RunUpdate()
 
 	TArray<TileChange> tileChanges;
 
-	// TILE CENTRIC, SLOW AS SHIT
-	//for (ATile* Tile : TileManager->Tiles)
-	//{
-	//	for (AReligion* Religion : Tile->GetReligions())
-	//	{
-			//if (Tile->GetPopulationOfReligion(Religion) <= 0)
-			//	continue;
-			//ATile* TargetTile;
-			//ERitualType RitualType = Religion->GetHighestRitualType();
+	for (ATile* Tile : TileManager->Tiles)
+	{
+		for (AReligion* Religion : Tile->GetReligions())
+		{
+			if (Tile->GetPopulationOfReligion(Religion) <= 0)
+				continue;
+			
+			ATile* TargetTile = Tile->CurrentTarget;
 
-			//if (RitualType == ERitualType::Aggressive)
-			//{
-			//	TargetTile = CalculateNearestEnemyTile(Religion);
-			//}
-			//else
-			//{
-			//	TargetTile = CalculateNearestEmptyTile(Religion);
-			//}
+			ERitualType RitualType = Religion->GetHighestRitualType();
 
-	//// RELIGION CENTRIC, FAST BUT DUMB
-	//for (AReligion* Religion : AllReligions)
-	//{
-	//	ATile* TargetTile;
-	//	ERitualType RitualType = Religion->GetHighestRitualType();
+			if (TargetIsValid(TargetTile, Religion, RitualType)) {
 
-	//	if (RitualType == ERitualType::Aggressive)
-	//	{
-	//		TargetTile = CalculateNearestEnemyTile(Religion);
-	//	}
-	//	else
-	//	{
-	//		TargetTile = CalculateNearestEmptyTile(Religion);
-	//	}
+			}
+			else {
+				ATile* EnemyTile = CalculateNearestEnemyTile(Tile, Religion);
+				ATile* EmptyTile = CalculateNearestEmptyTile(Tile, Religion);
 
-	//	for (ATile* Tile : TileManager->Tiles)
-	//	{
+				if (!EnemyTile && EmptyTile)
+				{
+					TargetTile = EmptyTile;
+				}
+				else if (EnemyTile && !EmptyTile)
+				{
+					TargetTile = EnemyTile;
+				}
+				else if (!EnemyTile && !EmptyTile)
+				{
+					TargetTile = nullptr;
+				}
+				else
+				{
+					float EnemyDistance = FVector::DistSquaredXY(Tile->GetActorLocation(), EnemyTile->GetActorLocation());
+					float EmptyDistance = FVector::DistSquaredXY(Tile->GetActorLocation(), EnemyTile->GetActorLocation());
 
-			// BOTH CENTRICITIES:
+					if (RitualType == ERitualType::Aggressive)
+					{
+						if (EnemyDistance < EmptyDistance * 2)
+							TargetTile = EnemyTile;
+						else
+							TargetTile = EmptyTile;
+					}
+					else
+					{
+						if (EnemyDistance * 3 < EmptyDistance)
+							TargetTile = EnemyTile;
+						else
+							TargetTile = EmptyTile;
+					}
+				}
+			}
+
 			int32 OurPopulation = Tile->GetPopulationOfReligion(Religion);
 
 			if (OurPopulation > 0)
@@ -264,14 +278,14 @@ void AReligionManager::RunUpdate()
 			ConsiderAndDoAttack(tileChange.enemyTile, tileChange.religion, tileChange.ritualType);
 			break;
 		case 2:
-			tileChange.tile->MovePopulation(tileChange.enemyTile, tileChange.religion, tileChange.ratio);
+			tileChange.tile->MovePopulation(tileChange.enemyTile, tileChange.religion, tileChange.ratio, tileChange.religion->GetMoveKeep());
 			ConsiderAndDoAttack(tileChange.enemyTile, tileChange.religion, tileChange.ritualType);
 			break;
 		case 3:
 			ConsiderAndDoAttack(tileChange.enemyTile, tileChange.religion, tileChange.ritualType);
 			break;
 		case 4:
-			tileChange.tile->MovePopulation(tileChange.enemyTile, tileChange.religion, tileChange.ratio);
+			tileChange.tile->MovePopulation(tileChange.enemyTile, tileChange.religion, tileChange.ratio, tileChange.religion->GetMoveKeep());
 			break;
 		};
 
@@ -282,12 +296,62 @@ void AReligionManager::RunUpdate()
 	for (AReligion* Religion : AllReligions)
 	{
 		Religion->Followers = 0;
+		Religion->OwnedTiles.Empty(50);
+		Religion->BorderTiles.Empty(20);
+	}
 
-		for (ATile* Tile : TileManager->Tiles)
+	EmptyTiles.Empty(900);
+	for (ATile* Tile : TileManager->Tiles)
+	{
+		if (Tile->GetPopulation() > 0)
 		{
-			Religion->Followers += Tile->GetPopulationOfReligion(Religion);
+			for (AReligion* Religion : Tile->GetReligions())
+			{
+				Religion->Followers += Tile->GetPopulationOfReligion(Religion);
+
+				if (Tile->GetReligiousPercentage(Religion) > 0.8)
+				{
+					Religion->OwnedTiles.Add(Tile);
+
+					if (Tile->HasPotentialTargetNeighbour(Religion))
+					{
+						Religion->BorderTiles.Add(Tile);
+					}
+				}
+			}
+		}
+		else
+		{
+			EmptyTiles.Add(Tile);
 		}
 	}
+
+	TSet<AReligion*> ReligionsToRemove;
+	for (AReligion* Religion : AllReligions)
+	{
+		if (Religion->Followers == 0)
+		{
+			// RELIGION KNOCKED OUT
+			ReligionsToRemove.Add(Religion);
+
+			// IF RELIGION 1
+			// GAME OVER FOR PLAYER
+		}
+	}
+
+	for (AReligion* Religion : ReligionsToRemove)
+	{
+		AllReligions.Remove(Religion);
+
+		Religion->Destroy();
+	}
+
+	if (AllReligions.Num() == 1)
+	{
+		// LAST RELIGION, PLAYER WINS
+	}
+
+	// TODO: POPULATION % VICTORY (minimum 50,000)
 }
 
 void AReligionManager::ConsiderAndDoAttack(ATile* Tile, AReligion* Religion, ERitualType RitualType)
@@ -316,12 +380,12 @@ void AReligionManager::ConsiderAndDoAttack(ATile* Tile, AReligion* Religion, ERi
 	switch (RitualType)
 	{
 	case ERitualType::Aggressive:
-		if (OurPopulation >= TheirPopulation * 1.5)
+		if (OurPopulation >= TheirPopulation * 1)
 			WantToBattle = true;
 		break;
 
 	case ERitualType::Communal:
-		if (OurPopulation >= TheirPopulation * 3)
+		if (OurPopulation >= TheirPopulation * 2)
 			WantToBattle = true;
 		break;
 
@@ -343,55 +407,128 @@ FColor AReligionManager::GenerateNewColor()
 	return NewColor;
 }
 
-ATile* AReligionManager::CalculateNearestEnemyTile(AReligion* Religion)
+ATile* AReligionManager::CalculateNearestEnemyTile(ATile* Tile, AReligion* Religion)
 {
 	TQueue<ATile*> Tiles;
 	TSet<ATile*> CheckedTiles;
 
-	Tiles.Enqueue(TileManager->GetTileAtLocation(Religion->GetActorLocation()));
-	ATile* CurrentTile;
+	ATile* NearestTile = nullptr;
+	float SqDistance = 9999999999;
 
-	while (Tiles.Dequeue(CurrentTile))
+	FVector TileLoc = Tile->GetActorLocation();
+	FVector OtherLoc;
+
+	for (auto OtherReligion : AllReligions)
 	{
-
-		if (CurrentTile->HasConflictingReligion(Religion))
-			return CurrentTile;
-
-		for (auto AdjacentTile : TileManager->GetAdjacentTiles(CurrentTile))
+		if (OtherReligion != Religion)
 		{
-			if (!CheckedTiles.Contains(AdjacentTile))
-				Tiles.Enqueue(AdjacentTile);
-		}
+			for (auto EnemyTile : OtherReligion->BorderTiles)
+			{
+				OtherLoc = EnemyTile->GetActorLocation();
+				float NewDist = FVector::DistSquaredXY(TileLoc, OtherLoc);
 
-		CheckedTiles.Add(CurrentTile);
+				if (NewDist < SqDistance)
+				{
+					SqDistance = NewDist;
+					NearestTile = (ATile*)EnemyTile;
+				}
+			}
+		}
 	}
 
-	return nullptr;
+	return NearestTile;
+
+	//Tiles.Enqueue(TileManager->GetTileAtLocation(Religion->GetActorLocation()));
+	//ATile* CurrentTile;
+
+	//while (Tiles.Dequeue(CurrentTile))
+	//{
+
+	//	if (CurrentTile->HasConflictingReligion(Religion))
+	//		return CurrentTile;
+
+	//	for (auto AdjacentTile : TileManager->GetAdjacentTiles(CurrentTile))
+	//	{
+	//		if (!CheckedTiles.Contains(AdjacentTile))
+	//			Tiles.Enqueue(AdjacentTile);
+	//	}
+
+	//	CheckedTiles.Add(CurrentTile);
+	//}
+
+	//return nullptr;
 }
 
-ATile* AReligionManager::CalculateNearestEmptyTile(AReligion* Religion)
+ATile* AReligionManager::CalculateNearestEmptyTile(ATile* Tile, AReligion* Religion)
 {
 	TQueue<ATile*> Tiles;
 	TSet<ATile*> CheckedTiles;
 
-	Tiles.Enqueue(TileManager->GetTileAtLocation(Religion->GetActorLocation()));
-	ATile* CurrentTile;
+	ATile* NearestTile = nullptr;
+	float SqDistance = 9999999999;
 
-	while (Tiles.Dequeue(CurrentTile))
+	FVector TileLoc = Tile->GetActorLocation();
+	FVector OtherLoc;
+
+	for (auto OtherTile : EmptyTiles)
 	{
+		OtherLoc = OtherTile->GetActorLocation();
+		float NewDist = FVector::DistSquaredXY(TileLoc, OtherLoc);
 
-		if (CurrentTile->GetPopulationOfReligion(Religion) == 0)
-			return CurrentTile;
-
-		for (auto AdjacentTile : TileManager->GetAdjacentTiles(CurrentTile))
+		if (NewDist < SqDistance)
 		{
-			if (!CheckedTiles.Contains(AdjacentTile))
-				Tiles.Enqueue(AdjacentTile);
+			SqDistance = NewDist;
+			NearestTile = (ATile*)OtherTile;
 		}
-
-		CheckedTiles.Add(CurrentTile);
 	}
 
-	return nullptr;
+	return NearestTile;
+
+	//TQueue<ATile*> Tiles;
+	//TSet<ATile*> CheckedTiles;
+
+	//Tiles.Enqueue(TileManager->GetTileAtLocation(Religion->GetActorLocation()));
+	//ATile* CurrentTile;
+
+	//while (Tiles.Dequeue(CurrentTile))
+	//{
+
+	//	if (CurrentTile->GetPopulationOfReligion(Religion) == 0)
+	//		return CurrentTile;
+
+	//	for (auto AdjacentTile : TileManager->GetAdjacentTiles(CurrentTile))
+	//	{
+	//		if (!CheckedTiles.Contains(AdjacentTile))
+	//			Tiles.Enqueue(AdjacentTile);
+	//	}
+
+	//	CheckedTiles.Add(CurrentTile);
+	//}
+
+	//return nullptr;
+}
+
+bool AReligionManager::TargetIsValid(ATile* TargetTile, AReligion* Religion, ERitualType RitualType)
+{
+	if (TargetTile == nullptr)
+		return false;
+
+	switch (RitualType)
+	{
+	case ERitualType::Aggressive:
+		if (TargetTile->HasConflictingReligion(Religion))
+			return true;
+		break;
+	case ERitualType::Communal:
+		if (!TargetTile->HasConflictingReligion(Religion))
+			return true;
+		break;
+	case ERitualType::Meditiative:
+		if (!TargetTile->HasConflictingReligion(Religion))
+			return true;
+		break;
+	}
+
+	return false;
 }
 

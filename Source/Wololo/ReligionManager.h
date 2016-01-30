@@ -59,6 +59,10 @@ public:
 
 private:
 	FColor GenerateNewColor();
-	ATile* CalculateNearestEnemyTile(AReligion* Religion);
-	ATile* CalculateNearestEmptyTile(AReligion* Religion);
+	ATile* CalculateNearestEnemyTile(ATile* Tile, AReligion* Religion);
+	ATile* CalculateNearestEmptyTile(ATile* Tile, AReligion* Religion);
+
+	TSet<ATile*> EmptyTiles;
+
+	bool TargetIsValid(ATile* TargetTile, AReligion* Religion, ERitualType RitualType);
 };
