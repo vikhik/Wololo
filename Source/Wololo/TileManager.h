@@ -44,6 +44,9 @@ public:
 		void SpawnTilesAndTowns();
 
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
+		ATile* GetTileInDirection(ATile* Source, ATile* Target);
+
+	UFUNCTION(BlueprintCallable, Category = "Tiles")
 		ATile* GetTileAtLocation(FVector Location);
 
 	UFUNCTION(BlueprintCallable, Category = "Tiles")

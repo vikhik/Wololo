@@ -2,6 +2,11 @@ Tiles:
     Biomes
     - Growth modifiers, etc.
 
+
+
+
+
+
 Spread:
     Make population spread to the edges, lower at the middle
     - Meditative Spreads even if not a majority

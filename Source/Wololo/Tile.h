@@ -29,6 +29,12 @@ public:
 		float Height;
 
 	UFUNCTION(BlueprintPure, Category = "Tiles")
+		bool HasConflictingReligion(AReligion* Religion);
+
+	UFUNCTION(BlueprintPure, Category = "Tiles")
+		bool IsEmpty();
+
+	UFUNCTION(BlueprintPure, Category = "Tiles")
 		AReligion* ReadyToSpread(); // Returns nullptr if false
 
 	UFUNCTION(BlueprintPure, Category = "Tiles")
