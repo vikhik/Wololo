@@ -135,22 +135,22 @@ void AReligionManager::RunUpdate()
 
 	TArray<TileChange> tileChanges;
 
-	for (AReligion* Religion : AllReligions)
+	for (ATile* Tile : TileManager->Tiles)
 	{
-		ATile* TargetTile;
-		ERitualType RitualType = Religion->GetHighestRitualType();
+		for (AReligion* Religion : Tile->GetReligions())
+		{
+			ATile* TargetTile;
+			ERitualType RitualType = Religion->GetHighestRitualType();
 
-		if (RitualType == ERitualType::Aggressive)
-		{
-			TargetTile = CalculateNearestEnemyTile(Religion);
-		}
-		else
-		{
-			TargetTile = CalculateNearestEmptyTile(Religion);
-		}
+			if (RitualType == ERitualType::Aggressive)
+			{
+				TargetTile = CalculateNearestEnemyTile(Religion);
+			}
+			else
+			{
+				TargetTile = CalculateNearestEmptyTile(Religion);
+			}
 
-		for (ATile* Tile : TileManager->Tiles)
-		{
 			int32 OurPopulation = Tile->GetPopulationOfReligion(Religion);
 
 			if (OurPopulation > 0)
