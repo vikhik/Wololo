@@ -70,9 +70,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 Followers;
 
-	// Slowly shift to new Ritual Type
 	UFUNCTION(BlueprintCallable, Category = "Religion")
-		void ShiftToNewRitualType(ERitualType Type, float Amount = 0.1f);
+		void SetRitualInfluences(float AggressiveInfluence, float CommunalInfluence, float MeditativeInfluence);
 
 	// COMPLETELY OVERRIDE EXISTING RITUALS
 	UFUNCTION(BlueprintCallable, Category = "Religion")
@@ -82,4 +81,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FRitualData ReligiousRitual;
+
+private:
+	void CleanUpInfluences();
+
+	void SetFromVec(FVector ToUse);
 };

@@ -68,14 +68,14 @@ struct FRitualData
 
 	void Add(FRitualData RitualData, float Influence)
 	{
-		SpreadMinimumPercentage = RitualData.SpreadMinimumPercentage* Influence;
-		SpreadMinimumPopulation = RitualData.SpreadMinimumPopulation* Influence;
-		SpreadRate				= RitualData.SpreadRate				* Influence;
-		GrowthRate				= RitualData.GrowthRate				* Influence;
-		GrowthMax				= RitualData.GrowthMax				* Influence;
-		ConflictOffense			= RitualData.ConflictOffense		* Influence;
-		ConflictDefense			= RitualData.ConflictDefense		* Influence;
-		ConflictConversion		= RitualData.ConflictConversion		* Influence;
+		SpreadMinimumPercentage += RitualData.SpreadMinimumPercentage* Influence;
+		SpreadMinimumPopulation += RitualData.SpreadMinimumPopulation* Influence;
+		SpreadRate				+= RitualData.SpreadRate				* Influence;
+		GrowthRate				+= RitualData.GrowthRate				* Influence;
+		GrowthMax				+= RitualData.GrowthMax				* Influence;
+		ConflictOffense			+= RitualData.ConflictOffense		* Influence;
+		ConflictDefense			+= RitualData.ConflictDefense		* Influence;
+		ConflictConversion		+= RitualData.ConflictConversion		* Influence;
 	}
 };
 

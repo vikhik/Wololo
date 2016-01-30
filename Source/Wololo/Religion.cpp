@@ -100,17 +100,13 @@ float AReligion::GetMeditativeInfluence() const
 	return RitualInfluences[ERitualType::Meditiative];
 }
 
-void AReligion::ShiftToNewRitualType(ERitualType Type, float Amount /*= 0.1f*/)
+void AReligion::SetRitualInfluences(float AggressiveInfluence, float CommunalInfluence, float MeditativeInfluence)
 {
-	for (auto Influence : RitualInfluences)
-	{
-		Influence.Value *= (1.0 - Amount); // reduce all influences by the %
-	}
+	RitualInfluences.Empty();
 
-	if (!RitualInfluences.Contains(Type))
-		RitualInfluences.Add(Type);
-
-	RitualInfluences[Type] += Amount; // Should keep us at 1.0 overall influence
+	RitualInfluences.Add(ERitualType::Aggressive, AggressiveInfluence);
+	RitualInfluences.Add(ERitualType::Communal, CommunalInfluence);
+	RitualInfluences.Add(ERitualType::Meditiative, MeditativeInfluence);
 
 	UpdateRitualData();
 }
@@ -128,6 +124,8 @@ void AReligion::SetNewType(ERitualType Type)
 
 void AReligion::UpdateRitualData()
 {
+	CleanUpInfluences();
+
 	ReligiousRitual.Zero();
 
 	for (auto Influence : RitualInfluences)
@@ -136,5 +134,23 @@ void AReligion::UpdateRitualData()
 
 		ReligiousRitual.Add(RitualData, Influence.Value);
 	}
+}
+
+void AReligion::CleanUpInfluences()
+{
+	FVector VectorRep = FVector(GetAggressiveInfluence(), GetCommunalInfluence(), GetMeditativeInfluence());
+
+	VectorRep.Normalize();
+
+	SetFromVec(VectorRep);
+}
+
+void AReligion::SetFromVec(FVector ToUse)
+{
+	RitualInfluences.Empty();
+
+	RitualInfluences.Add(ERitualType::Aggressive, ToUse.X);
+	RitualInfluences.Add(ERitualType::Communal, ToUse.Y);
+	RitualInfluences.Add(ERitualType::Meditiative, ToUse.Z);
 }
 
