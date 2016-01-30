@@ -30,6 +30,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
 		void AddPopulation(AReligion* Religion, int32 AddedPop);
 
+	UFUNCTION(BlueprintCallable, Category = "Tiles")
+		AReligion* GetStrongestReligion();
+
+	UFUNCTION(BlueprintPure, Category = "Tiles")
+		TArray<AReligion*> GetReligions();
+
 	TMap<AReligion*, int32> Population;
 	
 };

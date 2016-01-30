@@ -35,6 +35,36 @@ int32 ATown::GetPopulation()
 	return BasePopulation;
 }
 
+TArray<AReligion*> ATown::GetReligions()
+{
+	TArray<AReligion*> Religions;
+
+	for (auto ReligiousPopulation : Population)
+	{
+		Religions.Add(ReligiousPopulation.Key);
+	}
+
+	return Religions;
+}
+
+AReligion* ATown::GetStrongestReligion()
+{
+	int32 HighestPop = 0;
+	AReligion* HighestReligion = 0;
+
+	for (auto Religion : GetReligions())
+	{
+		if (GetPopulationOfReligion(Religion) > HighestPop)
+		{
+			HighestPop = GetPopulationOfReligion(Religion);
+			HighestReligion = Religion;
+		}
+	}
+
+	return HighestReligion;
+}
+
+
 int32 ATown::GetPopulationOfReligion(AReligion* Religion)
 {
 	int32 Pop = 0;
