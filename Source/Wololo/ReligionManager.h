@@ -51,4 +51,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		ATileManager* TileManager;
+
+private:
+	FColor GenerateNewColor();
 };
