@@ -201,7 +201,7 @@ void AReligionManager::RunUpdate()
 		      
 		      if (DoDebug) print("Attacking Adjacent");
 		    }
-		  else
+		  else if (TargetTile)
 		    {
 		      // No Adjacent Enemy tile
 		      ATile* NearbyTileInDirection = TileManager->GetTileInDirection(Tile, TargetTile);
