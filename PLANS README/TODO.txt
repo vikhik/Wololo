@@ -1,3 +1,20 @@
-1) fix up to target Structure as shown in Structure.txt
-2) Have a visual representation of each Tile's state
-3) Have Growth rules that are enacted by the Religion Manager
+Tiles:
+    Biomes
+    - Growth modifiers, etc.
+
+Spread:
+    Make population spread to the edges, lower at the middle
+    - Meditative Spreads even if not a majority
+    - Communal Spreads ???
+    - Aggro Spreads ???
+
+Conflict:
+    Battles aren't every tick, they just happen sometimes
+    - Aggro attacks a lot
+    - Comms attacks when threatened (?)
+    - Meditative doesn't attack
+    
+Growth:
+    - Communities grow fast
+    - Mediative grow slow
+    - Aggro grow medium
