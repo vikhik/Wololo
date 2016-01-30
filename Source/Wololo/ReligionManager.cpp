@@ -184,11 +184,11 @@ void AReligionManager::RunUpdate()
 
 							PopulationChange[OtherPopulation.Key] -= ActualDeaths;
 
-							print("Deaths : " + FString::FromInt(ActualDeaths));
+							//print("Deaths : " + FString::FromInt(ActualDeaths));
 						}
 						else
 						{
-							print("Fully Defended");
+							//print("Fully Defended");
 						}
 
 						// Conversion
@@ -210,7 +210,7 @@ void AReligionManager::RunUpdate()
 							PopulationChange[ReligiousPopulation.Key] += PotentialConverts;
 							PopulationChange[OtherPopulation.Key] -= PotentialConverts;
 
-							print("Conversions: " + FString::FromInt(PotentialConverts));
+							//print("Conversions: " + FString::FromInt(PotentialConverts));
 						}
 					}
 				}
@@ -227,9 +227,34 @@ void AReligionManager::RunUpdate()
 		{
 			NumReligiousTiles++;
 
-			if (ReligiousPopulation.Value < ReligiousPopulation.Key->GetGrowthMax())
+			float GrowthRate = ReligiousPopulation.Key->GetGrowthRate();
+
+			float PopMaxRatio = ReligiousPopulation.Value / ReligiousPopulation.Key->GetGrowthMax();
+
+			if (PopMaxRatio < 0.5)
 			{
-				Tile->AddPopulation(ReligiousPopulation.Key, ReligiousPopulation.Value * ReligiousPopulation.Key->GetGrowthRate());
+				GrowthRate *= 1.0;
+			}
+			else if (PopMaxRatio < 0.75)
+			{
+				GrowthRate *= 0.5;
+			}
+			else if (PopMaxRatio < 1.0)
+			{
+				GrowthRate *= 0.25;
+			}
+			else
+			{
+				GrowthRate = 0.f;
+			}
+
+			int32 GrowthAmount = ReligiousPopulation.Value * GrowthRate;
+
+			if (GrowthAmount > 0)
+			{
+				Tile->AddPopulation(ReligiousPopulation.Key, GrowthAmount);
+
+				//print("Growth: " + FString::FromInt(GrowthAmount));
 			}
 		}
 	}
