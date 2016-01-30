@@ -37,6 +37,9 @@ public:
 		float GetGrowthRate() const;
 
 	UFUNCTION(BlueprintPure, Category = "Religion")
+		float GetGrowthMax() const;
+
+	UFUNCTION(BlueprintPure, Category = "Religion")
 		float GetConflictOffense() const;
 
 	UFUNCTION(BlueprintPure, Category = "Religion")
@@ -44,6 +47,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Religion")
 		float GetConflictConversion() const;
+
+	UFUNCTION(BlueprintPure, Category = "Religion")
+		ERitualType GetHighestRitualType() const;
 
 	// Other stuff
 

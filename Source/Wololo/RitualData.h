@@ -22,6 +22,9 @@ struct FRitualData
 		float GrowthRate = 0.1f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 GrowthMax = 5000;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float ConflictOffense = 0.2f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -35,6 +38,7 @@ struct FRitualData
 		int32 SpreadMinPop = 200,
 		float SpreadRatePercentage = 0.2f,
 		float GrowthRatePercentage = 0.1f,
+		int32 GrowthMaxPop = 5000,
 		float ConflictOffensePercentage = 0.1f,
 		float ConflictDefensePercentage = 0.1f,
 		float ConflictConversionPercentage = 0.1f) :
@@ -42,6 +46,7 @@ struct FRitualData
 		SpreadMinimumPopulation(SpreadMinPop),
 		SpreadRate(SpreadRatePercentage),
 		GrowthRate(GrowthRatePercentage),
+		GrowthMax(GrowthMaxPop),
 		ConflictOffense(ConflictOffensePercentage),
 		ConflictDefense(ConflictDefensePercentage),
 		ConflictConversion(ConflictConversionPercentage)
@@ -55,6 +60,7 @@ struct FRitualData
 		SpreadMinimumPopulation = 0;
 		SpreadRate = 0;
 		GrowthRate = 0;
+		GrowthMax = 0;
 		ConflictOffense = 0;
 		ConflictDefense = 0;
 		ConflictConversion = 0;
@@ -66,6 +72,7 @@ struct FRitualData
 		SpreadMinimumPopulation = RitualData.SpreadMinimumPopulation* Influence;
 		SpreadRate				= RitualData.SpreadRate				* Influence;
 		GrowthRate				= RitualData.GrowthRate				* Influence;
+		GrowthMax				= RitualData.GrowthMax				* Influence;
 		ConflictOffense			= RitualData.ConflictOffense		* Influence;
 		ConflictDefense			= RitualData.ConflictDefense		* Influence;
 		ConflictConversion		= RitualData.ConflictConversion		* Influence;

@@ -227,7 +227,7 @@ void AReligionManager::RunUpdate()
 		{
 			NumReligiousTiles++;
 
-			if (ReligiousPopulation.Value < 5000)
+			if (ReligiousPopulation.Value < ReligiousPopulation.Key->GetGrowthMax())
 			{
 				Tile->AddPopulation(ReligiousPopulation.Key, ReligiousPopulation.Value * ReligiousPopulation.Key->GetGrowthRate());
 			}

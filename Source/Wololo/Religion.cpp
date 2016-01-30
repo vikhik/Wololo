@@ -45,6 +45,11 @@ float AReligion::GetGrowthRate() const
 	return ReligiousRitual.GrowthRate;
 }
 
+float AReligion::GetGrowthMax() const
+{
+	return ReligiousRitual.GrowthMax;
+}
+
 float AReligion::GetConflictOffense() const
 {
 	return ReligiousRitual.ConflictOffense;
@@ -58,6 +63,20 @@ float AReligion::GetConflictDefense() const
 float AReligion::GetConflictConversion() const
 {
 	return ReligiousRitual.ConflictConversion;
+}
+
+ERitualType AReligion::GetHighestRitualType() const
+{
+	float Aggro = GetAggressiveInfluence();
+	float Comms = GetCommunalInfluence();
+	float Meds = GetMeditativeInfluence();
+
+	if (Aggro > Comms && Aggro > Meds)
+		return ERitualType::Aggressive;
+	else if (Comms > Aggro && Comms > Meds)
+		return ERitualType::Communal;
+	else
+		return ERitualType::Meditiative;
 }
 
 float AReligion::GetAggressiveInfluence() const
