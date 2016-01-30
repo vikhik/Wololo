@@ -26,6 +26,27 @@ void ATile::Tick( float DeltaTime )
 
 }
 
+bool ATile::HasConflictingReligion(AReligion* Religion)
+{
+	auto Religions = GetReligions();
+
+	if (Religions.Contains(Religion) && Religions.Num() > 1)
+	{
+		return true;
+	}
+	else if (Religions.Num() > 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool ATile::IsEmpty()
+{
+	return GetPopulation() == 0;
+}
+
 AReligion* ATile::ReadyToSpread()
 {
 	for (auto Religion : GetReligions())

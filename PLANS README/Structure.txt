@@ -1,7 +1,5 @@
 Desired architecture::
 
-
-
 Tiles
  - Have a population (even non-town Tiles)
  - May have a town (needs a pointer!)
@@ -11,4 +9,3 @@ Tiles
  
 Religion
  - ReligionManager needs to ask TileManager for all tiles, and update the Followers of each Religion (on Tick)
-

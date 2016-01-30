@@ -1,0 +1,17 @@
+Aggro: 
+    If Enemy adjacent, don't move.
+        If 1.5x enemy, attack them with 2/3. (BATTLE FUNCTION)
+    Else move 1/2 towards nearest enemy.
+        
+Communal:
+    If enemy adjacent, don't move. 
+        If 3x enemy, attack them with 2/3. (BATTLE FUNCTION)
+    Else move 1/2 towards nearest not-occupied-by-us tile
+    
+Meditative:
+    If enemy adjacent, don't move, 
+        convert 1/3.
+    Else move 1/3 towards nearest (not-occupied-by-us / away-from-enemy) tile
+    
+End of turn:
+    All pops grow equally (?)

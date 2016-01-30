@@ -59,6 +59,11 @@ void ATileManager::SpawnTilesAndTowns()
 	}
 }
 
+ATile* ATileManager::GetTileInDirection(ATile* Source, ATile* Target)
+{
+	return nullptr;
+}
+
 ATile* ATileManager::SpawnTileAtLocation(FVector Location)
 {
 	UWorld* World = GetWorld();
