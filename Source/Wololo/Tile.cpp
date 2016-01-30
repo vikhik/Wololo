@@ -75,6 +75,19 @@ void ATile::SetWidthAndHeight(float NewWidth, float NewHeight)
 	this->Height = NewHeight;
 }
 
+TMap<AReligion*, int32> ATile::GetPopulationByReligion()
+{
+	// TODO: If we ever spawn Towns later...
+	if (Town)
+	{
+		return Town->Population;
+	}
+	else
+	{
+		return Population;
+	}
+}
+
 int32 ATile::GetPopulation()
 {
 	int32 BasePopulation = 0;

@@ -100,7 +100,8 @@ void AReligionManager::SpawnReligionInEveryTown()
 
 		int32 RandomPop = BasePopulation + FMath::FRandRange(-PopulationVariance, PopulationVariance);
 
-		((ATile*)TilesWithTowns[i])->AddPopulation(Religion, RandomPop);
+		ATile* Tile = ((ATile*)TilesWithTowns[i]);
+		Tile->AddPopulation(Religion, RandomPop);
 
 		if (i >= Colors.Num())
 		{
@@ -151,15 +152,16 @@ void AReligionManager::RunUpdate()
 		if (Religions.Num() > 1)
 		{
 			// lowest pop first
-			Tile->Population.ValueSort([](int32 PopA, int32 PopB) {
+			auto Population = Tile->GetPopulationByReligion();
+			Population.ValueSort([](int32 PopA, int32 PopB) {
 				return PopA < PopB;
 			});
 
 			TMap<AReligion*, int32> PopulationChange;
 
-			for (auto ReligiousPopulation : Tile->Population)
+			for (auto ReligiousPopulation : Population)
 			{
-				for (auto OtherPopulation : Tile->Population)
+				for (auto OtherPopulation : Population)
 				{
 					// for each other pop
 					// our pop * offense - their pop * defense = their pop change (max 0)
@@ -184,6 +186,10 @@ void AReligionManager::RunUpdate()
 
 							print("Deaths : " + FString::FromInt(ActualDeaths));
 						}
+						else
+						{
+							print("Fully Defended");
+						}
 
 						// Conversion
 
@@ -203,8 +209,9 @@ void AReligionManager::RunUpdate()
 
 							PopulationChange[ReligiousPopulation.Key] += PotentialConverts;
 							PopulationChange[OtherPopulation.Key] -= PotentialConverts;
-						}
 
+							print("Conversions: " + FString::FromInt(PotentialConverts));
+						}
 					}
 				}
 			}
@@ -214,12 +221,11 @@ void AReligionManager::RunUpdate()
 	// 3. Growth
 	for (ATile* Tile : TileManager->Tiles)
 	{
-		for (auto ReligiousPopulation : Tile->Population)
+		int32 NumReligiousTiles = 0;
+
+		for (auto ReligiousPopulation : Tile->GetPopulationByReligion())
 		{
-			if (ReligiousPopulation.Key->Color == FColor::FromHex("0000A6FF"))
-			{
-				Tile->AddPopulation(ReligiousPopulation.Key, ReligiousPopulation.Value * ReligiousPopulation.Key->GetGrowthRate());
-			}
+			NumReligiousTiles++;
 
 			if (ReligiousPopulation.Value < 5000)
 			{

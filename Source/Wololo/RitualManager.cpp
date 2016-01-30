@@ -15,7 +15,7 @@ RitualManager::RitualManager()
 			0.7f,	// Spread Minimum Percentage requirement (How much of a tile we need control before we spread)
 			500,	// Spread Minimum Population requirement
 			0.4f,	// Spread Rate (how much of the current population MOVES to the next tile)
-			0.20f,	// Growth Rate (Compound interest on Population)
+			0.05f,	// Growth Rate (Compound interest on Population)
 			0.6f,	// Conflict Offense (% of population that potentially kill)
 			0.0f,	// Conflict Defense (% of population that ignores kills)
 			0.0f	// Conflict Conversion (% of pop converted from the enemy)
@@ -27,7 +27,7 @@ RitualManager::RitualManager()
 			0.8f,
 			700, 
 			0.3f, 
-			0.30f, 
+			0.15f, 
 			0.0f, 
 			0.0f,
 			0.6f
@@ -39,7 +39,7 @@ RitualManager::RitualManager()
 			0.9f,
 			300,
 			0.2f, 
-			0.25f, 
+			0.10f, 
 			0.0f, 
 			0.6f,
 			0.0f

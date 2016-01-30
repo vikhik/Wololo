@@ -52,6 +52,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
 		void SetWidthAndHeight(float NewWidth, float NewHeight);
 
+	TMap<AReligion*, int32> GetPopulationByReligion();
 
+private:
 	TMap<AReligion*, int32> Population;
 };
