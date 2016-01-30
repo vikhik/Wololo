@@ -34,9 +34,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Tiles")
 		float GetReligiousPercentage(AReligion* Religion);
 
-	UFUNCTION(BlueprintCallable, Category = "Tiles")
-		void SetWidthAndHeight(float NewWidth, float NewHeight);
-
 	UFUNCTION(BlueprintPure, Category = "Tiles")
 		int32 GetPopulation();
 
@@ -47,7 +44,11 @@ public:
 		void AddPopulation(AReligion* Religion, int32 AddedPop);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		ATown* Town;
+		ATown* Town; // may be nullptr
+
+	UFUNCTION(BlueprintCallable, Category = "Tiles")
+		void SetWidthAndHeight(float NewWidth, float NewHeight);
+
 
 	TMap<AReligion*, int32> Population;
 };

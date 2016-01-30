@@ -38,8 +38,8 @@ void ATileManager::SpawnTilesAndTowns()
 	TileHeight = Height / TilesHigh; // 50
 	TileWidth = Width / TilesWide; // 50
 
-	float MaxY = (TileHeight * 0.5) + (TileHeight * TilesHigh * 0.5); // 275
-	float MaxX = (TileWidth * 0.5) + (TileWidth * TilesWide * 0.5); // 275
+	float MaxY = (TileHeight * TilesHigh * 0.5); // 250
+	float MaxX = (TileWidth * TilesWide * 0.5); // 250
 
 	for (float y = -MaxY; y < MaxY; y += TileHeight)
 	{
