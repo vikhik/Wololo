@@ -26,6 +26,20 @@ void ATile::Tick( float DeltaTime )
 
 }
 
+AReligion* ATile::ReadyToSpread()
+{
+	for (auto Religion : GetReligions())
+	{
+		if (GetReligiousPercentage(Religion) > Religion->GetSpreadMinimumPercentage()
+			&& GetPopulationOfReligion(Religion) > Religion->GetSpreadMinimumPopulation())
+		{
+			return Religion;
+		}
+	}
+
+	return nullptr;
+}
+
 TArray<AReligion*> ATile::GetReligions()
 {
 	TArray<AReligion*> Religions;
@@ -94,12 +108,7 @@ void ATile::AddPopulation(AReligion* Religion, int32 AddedPop)
 {
 	if (Town)
 	{
-		if (!Town->Population.Contains(Religion))
-		{
-			Town->Population.Add(Religion, 0);
-		}
-
-		Town->Population[Religion] += AddedPop;
+		Town->AddPopulation(Religion, AddedPop);
 	}
 	else
 	{
@@ -107,6 +116,11 @@ void ATile::AddPopulation(AReligion* Religion, int32 AddedPop)
 			Population.Add(Religion, 0);
 
 		Population[Religion] += AddedPop;
+
+		if (Population[Religion] <= 0)
+		{
+			Population.Remove(Religion);
+		}
 	}
 }
 

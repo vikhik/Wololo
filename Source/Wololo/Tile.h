@@ -29,6 +29,9 @@ public:
 		float Height;
 
 	UFUNCTION(BlueprintPure, Category = "Tiles")
+		AReligion* ReadyToSpread(); // Returns nullptr if false
+
+	UFUNCTION(BlueprintPure, Category = "Tiles")
 		TArray<AReligion*> GetReligions();
 
 	UFUNCTION(BlueprintPure, Category = "Tiles")

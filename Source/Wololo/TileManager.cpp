@@ -7,10 +7,10 @@
 // Sets default values
 ATileManager::ATileManager() : 
 	TownSpawnChance(0.1f),
-	Height(500),
-	Width(500),
-	TilesHigh(10),
-	TilesWide(10),
+	Height(3000.0),
+	Width(3000.0),
+	TilesHigh(30),
+	TilesWide(30),
 	SpawnZ(20)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -35,15 +35,15 @@ void ATileManager::Tick( float DeltaTime )
 
 void ATileManager::SpawnTilesAndTowns()
 {
-	TileHeight = Height / TilesHigh; // 50
-	TileWidth = Width / TilesWide; // 50
+	TileHeight = Height / TilesHigh; // 100
+	TileWidth = Width / TilesWide; // 100
 
-	float MaxY = (TileHeight * TilesHigh * 0.5); // 250
-	float MaxX = (TileWidth * TilesWide * 0.5); // 250
+	MaxY = (TileHeight * TilesHigh * 0.5) - TileHeight * 0.5; // 1450
+	MaxX = (TileWidth * TilesWide * 0.5) - TileHeight * 0.5; // 1450
 
-	for (float y = -MaxY; y < MaxY; y += TileHeight)
+	for (float y = -MaxY; y <= MaxY; y += TileHeight) // [-1450, 1450]
 	{
-		for (float x = -MaxX; x < MaxX; x += TileHeight)
+		for (float x = -MaxX; x <= MaxX; x += TileHeight)
 		{
 			FVector Pos = FVector(x, y, SpawnZ);
 
@@ -88,6 +88,44 @@ ATile* ATileManager::GetTileAtLocation(FVector Location)
 	}
 
 	return nullptr;
+}
+
+TArray<ATile*> ATileManager::GetAdjacentTiles(ATile* Tile)
+{
+	TArray<ATile*> Tiles;
+
+	FVector Location = Tile->GetActorLocation();
+	FVector AdjustedLocation;
+
+	if (Location.X > -MaxX)
+	{
+		AdjustedLocation = Location;
+		AdjustedLocation.X -= TileWidth;
+		Tiles.Add(GetTileAtLocation(AdjustedLocation));
+	}
+
+	if (Location.X < MaxX)
+	{
+		AdjustedLocation = Location;
+		AdjustedLocation.X += TileWidth;
+		Tiles.Add(GetTileAtLocation(AdjustedLocation));
+	}
+
+	if (Location.Y > -MaxY)
+	{
+		AdjustedLocation = Location;
+		AdjustedLocation.Y -= TileHeight;
+		Tiles.Add(GetTileAtLocation(AdjustedLocation));
+	}
+
+	if (Location.Y < MaxY)
+	{
+		AdjustedLocation = Location;
+		AdjustedLocation.Y += TileHeight;
+		Tiles.Add(GetTileAtLocation(AdjustedLocation));
+	}
+
+	return Tiles;
 }
 
 ATown* ATileManager::SpawnTownAtTile(ATile* Tile)

@@ -11,10 +11,6 @@ AReligion::AReligion()
 	PrimaryActorTick.bCanEverTick = true;
 
 	NumberOfFollowers = 1000;
-
-	TypeInfluences.SetNum((uint8)EReligionType::MAX);
-
-	TypeInfluences[(uint8)CurrentType] = 1.0;
 }
 
 // Called when the game starts or when spawned
@@ -31,14 +27,102 @@ void AReligion::Tick( float DeltaTime )
 
 }
 
-void AReligion::SetNewType(EReligionType Type)
+float AReligion::GetSpreadMinimumPercentage()
 {
-	for (auto influence : TypeInfluences)
+	float SpreadMinimumPercentage = 0.f;
+
+	for (auto Influence : RitualInfluences)
 	{
-		influence = 0;
+		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
+
+		SpreadMinimumPercentage += RitualData.SpreadMinimumPercentage * Influence.Value;
+	}
+
+	return SpreadMinimumPercentage;
+}
+
+int32 AReligion::GetSpreadMinimumPopulation()
+{
+	int32 SpreadMinimumPopulation = 0;
+
+	for (auto Influence : RitualInfluences)
+	{
+		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
+
+		SpreadMinimumPopulation += RitualData.SpreadMinimumPopulation * Influence.Value;
+	}
+
+	return SpreadMinimumPopulation;
+}
+
+float AReligion::GetSpreadRate()
+{
+	float SpreadRate = 0.f;
+
+	for (auto Influence : RitualInfluences)
+	{
+		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
+
+		SpreadRate += RitualData.SpreadRate * Influence.Value;
+	}
+
+	return SpreadRate;
+}
+
+float AReligion::GetConflictOffense()
+{
+	float ConflictOffense = 0.f;
+
+	for (auto Influence : RitualInfluences)
+	{
+		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
+
+		ConflictOffense += RitualData.ConflictOffense * Influence.Value;
+	}
+
+	return ConflictOffense;
+}
+
+float AReligion::GetConflictDefense()
+{
+	float ConflictDefense = 0.f;
+
+	for (auto Influence : RitualInfluences)
+	{
+		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
+
+		ConflictDefense += RitualData.ConflictDefense * Influence.Value;
+	}
+
+	return ConflictDefense;
+}
+
+float AReligion::GetGrowthRate()
+{
+	float GrowthRate = 0.f;
+
+	for (auto Influence : RitualInfluences)
+	{
+		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
+
+		GrowthRate += RitualData.GrowthRate * Influence.Value;
+	}
+
+	return GrowthRate;
+}
+
+void AReligion::SetNewType(ERitualType Type)
+{
+	for (auto Influence : RitualInfluences)
+	{
+		Influence.Value = 0.f;
 	}
 
 	CurrentType = Type;
 
+	if (!RitualInfluences.Contains(Type))
+		RitualInfluences.Add(Type);
+
+	RitualInfluences[Type] = 1.0f;
 }
 

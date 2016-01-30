@@ -41,7 +41,7 @@ public:
 		TArray<AReligion*> AllReligions;
 
 	UFUNCTION(BlueprintCallable, Category = "Religion")
-		void SpawnReligionAtLocation(FVector Location, EReligionType Type);
+		void SpawnReligionAtLocation(FVector Location, ERitualType Type);
 
 	UFUNCTION(BlueprintCallable, Category = "Religion")
 		void SpawnNumberReligions(int32 Num);
@@ -51,6 +51,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		ATileManager* TileManager;
+
+	UFUNCTION(BlueprintCallable, Category = "Religion")
+		void RunUpdate();
 
 private:
 	FColor GenerateNewColor();

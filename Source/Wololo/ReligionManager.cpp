@@ -54,7 +54,7 @@ void AReligionManager::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 }
 
-void AReligionManager::SpawnReligionAtLocation(FVector Location, EReligionType Type)
+void AReligionManager::SpawnReligionAtLocation(FVector Location, ERitualType Type)
 {
 	UWorld* World = GetWorld();
 
@@ -73,11 +73,11 @@ void AReligionManager::SpawnNumberReligions(int32 Num)
 
 	for (uint8 i = 0; i < Num; i++)
 	{
-		SpawnReligionAtLocation(FVector::ZeroVector, (EReligionType)Type);
+		SpawnReligionAtLocation(FVector::ZeroVector, (ERitualType)Type);
 
 		Type++;
 
-		if ((EReligionType)Type == EReligionType::MAX)
+		if ((ERitualType)Type == ERitualType::MAX)
 		{
 			Type = 0;
 		}
@@ -114,6 +114,66 @@ void AReligionManager::SpawnReligionInEveryTown()
 		i++;
 		if (i >= TilesWithTowns.Num())
 			return; // ERROR LATER, EXIT FOR NOW
+	}
+}
+
+void AReligionManager::RunUpdate()
+{
+	// 1. Spread
+	for (ATile* Tile : TileManager->Tiles)
+	{
+		// if A single Religion has 80%+ and over 200 pop
+		AReligion* SpreadReligion = Tile->ReadyToSpread();
+
+		if (SpreadReligion)
+		{
+			auto AdjacentTiles = TileManager->GetAdjacentTiles(Tile);
+
+			auto RandomIndex = FMath::RandRange(0, AdjacentTiles.Num() - 1);
+
+			auto RandomTile = AdjacentTiles[RandomIndex];
+
+			auto SpreadPop = Tile->GetPopulationOfReligion(SpreadReligion) * SpreadReligion->GetSpreadRate();
+			auto TargetPop = RandomTile->GetPopulationOfReligion(SpreadReligion); 
+			SpreadPop -= TargetPop;
+
+			if (SpreadPop > 0) // Only spread if spreadpop is higher than existing pop
+			{
+				RandomTile->AddPopulation(SpreadReligion, SpreadPop);
+			}
+		}
+	}
+
+	// 2. Conflict
+	for (ATile* Tile : TileManager->Tiles)
+	{
+		auto Religions = Tile->GetReligions();
+
+		if (Religions.Num() > 1)
+		{
+			// lowest pop first
+			Tile->Population.ValueSort([](int32 PopA, int32 PopB) {
+				return PopA < PopB;
+			});
+
+			for (auto ReligiousPopulation : Tile->Population)
+			{
+				// for each other pop
+					// our pop * offense - their pop * defense = their pop change (max 0)
+			}
+		}
+	}
+
+	// 3. Growth
+	for (ATile* Tile : TileManager->Tiles)
+	{
+		for (auto ReligiousPopulation : Tile->Population)
+		{
+			if (ReligiousPopulation.Value < 5000)
+			{
+				Tile->AddPopulation(ReligiousPopulation.Key, ReligiousPopulation.Value * ReligiousPopulation.Key->GetGrowthRate());
+			}
+		}
 	}
 }
 

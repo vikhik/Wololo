@@ -46,6 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
 		ATile* GetTileAtLocation(FVector Location);
 
+	UFUNCTION(BlueprintCallable, Category = "Tiles")
+		TArray<ATile*> GetAdjacentTiles(ATile* Tile);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<ATile*> Tiles;
 
@@ -66,4 +69,7 @@ public:
 private:
 	float TileHeight;
 	float TileWidth;
+
+	float MaxY;
+	float MaxX;
 };

@@ -45,3 +45,16 @@ int32 ATown::GetPopulationOfReligion(AReligion* Religion)
 	return Pop;
 }
 
+void ATown::AddPopulation(AReligion* Religion, int32 AddedPop)
+{
+	if (!Population.Contains(Religion))
+		Population.Add(Religion, 0);
+
+	Population[Religion] += AddedPop;
+
+	if (Population[Religion] <= 0)
+	{
+		Population.Remove(Religion);
+	}
+}
+

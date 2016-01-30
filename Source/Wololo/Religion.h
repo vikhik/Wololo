@@ -3,16 +3,9 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "RitualData.h"
+#include "RitualManager.h"
 #include "Religion.generated.h"
-
-UENUM()
-enum class EReligionType : uint8
-{
-	Aggressive, // Rock
-	Communal, // Paper
-	Meditiative, // Scissors
-	MAX 
-};
 
 UCLASS()
 class WOLOLO_API AReligion : public AActor
@@ -29,18 +22,41 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
 
+	// TRAIT VALUES
+
+	UFUNCTION(BlueprintCallable, Category = "Religion")
+		float GetSpreadMinimumPercentage();
+
+	UFUNCTION(BlueprintCallable, Category = "Religion")
+		int32 GetSpreadMinimumPopulation();
+
+	UFUNCTION(BlueprintCallable, Category = "Religion")
+		float GetSpreadRate();
+
+	UFUNCTION(BlueprintCallable, Category = "Religion")
+		float GetConflictOffense();
+
+	UFUNCTION(BlueprintCallable, Category = "Religion")
+		float GetConflictDefense();
+
+	UFUNCTION(BlueprintCallable, Category = "Religion")
+		float GetGrowthRate();
+
+
+	// Other stuff
+
+	TMap<ERitualType, float> RitualInfluences; // 0.0 - 1.0
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FColor Color;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 NumberOfFollowers;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<float> TypeInfluences; // 0.0 - 1.0
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		EReligionType CurrentType;
+		ERitualType CurrentType;
 
 	UFUNCTION(BlueprintCallable, Category = "Religion")
-		void SetNewType(EReligionType Type);
+		void SetNewType(ERitualType Type);
 };

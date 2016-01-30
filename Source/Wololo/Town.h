@@ -27,6 +27,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Tiles")
 		int32 GetPopulationOfReligion(AReligion* Religion);
 
+	UFUNCTION(BlueprintCallable, Category = "Tiles")
+		void AddPopulation(AReligion* Religion, int32 AddedPop);
+
 	TMap<AReligion*, int32> Population;
 	
 };
