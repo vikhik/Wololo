@@ -1,25 +1,5 @@
-Tiles:
-    Biomes
-    - Growth modifiers, etc.
-
-
-
-
-
-
-Spread:
-    Make population spread to the edges, lower at the middle
-    - Meditative Spreads even if not a majority
-    - Communal Spreads ???
-    - Aggro Spreads ???
-
-Conflict:
-    Battles aren't every tick, they just happen sometimes
-    - Aggro attacks a lot
-    - Comms attacks when threatened (?)
-    - Meditative doesn't attack
-    
-Growth:
-    - Communities grow fast
-    - Mediative grow slow
-    - Aggro grow medium
+1) Win/Loss condition
+2) Restart UI
+3) Sounds
+4) Tile UI
+5) Look at giving each tile its own target (A* probably useful)
