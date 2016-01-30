@@ -135,22 +135,44 @@ void AReligionManager::RunUpdate()
 
 	TArray<TileChange> tileChanges;
 
-	for (ATile* Tile : TileManager->Tiles)
-	{
-		for (AReligion* Religion : Tile->GetReligions())
-		{
-			ATile* TargetTile;
-			ERitualType RitualType = Religion->GetHighestRitualType();
+	// TILE CENTRIC, SLOW AS SHIT
+	//for (ATile* Tile : TileManager->Tiles)
+	//{
+	//	for (AReligion* Religion : Tile->GetReligions())
+	//	{
+			//if (Tile->GetPopulationOfReligion(Religion) <= 0)
+			//	continue;
+			//ATile* TargetTile;
+			//ERitualType RitualType = Religion->GetHighestRitualType();
 
-			if (RitualType == ERitualType::Aggressive)
-			{
-				TargetTile = CalculateNearestEnemyTile(Religion);
-			}
-			else
-			{
-				TargetTile = CalculateNearestEmptyTile(Religion);
-			}
+			//if (RitualType == ERitualType::Aggressive)
+			//{
+			//	TargetTile = CalculateNearestEnemyTile(Religion);
+			//}
+			//else
+			//{
+			//	TargetTile = CalculateNearestEmptyTile(Religion);
+			//}
 
+	//// RELIGION CENTRIC, FAST BUT DUMB
+	//for (AReligion* Religion : AllReligions)
+	//{
+	//	ATile* TargetTile;
+	//	ERitualType RitualType = Religion->GetHighestRitualType();
+
+	//	if (RitualType == ERitualType::Aggressive)
+	//	{
+	//		TargetTile = CalculateNearestEnemyTile(Religion);
+	//	}
+	//	else
+	//	{
+	//		TargetTile = CalculateNearestEmptyTile(Religion);
+	//	}
+
+	//	for (ATile* Tile : TileManager->Tiles)
+	//	{
+
+			// BOTH CENTRICITIES:
 			int32 OurPopulation = Tile->GetPopulationOfReligion(Religion);
 
 			if (OurPopulation > 0)
@@ -323,14 +345,14 @@ FColor AReligionManager::GenerateNewColor()
 
 ATile* AReligionManager::CalculateNearestEnemyTile(AReligion* Religion)
 {
-	TArray<ATile*> Tiles;
-	TArray<ATile*> CheckedTiles;
+	TQueue<ATile*> Tiles;
+	TSet<ATile*> CheckedTiles;
 
-	Tiles.Add(TileManager->GetTileAtLocation(Religion->GetActorLocation()));
+	Tiles.Enqueue(TileManager->GetTileAtLocation(Religion->GetActorLocation()));
+	ATile* CurrentTile;
 
-	while (Tiles.Num() > 0)
+	while (Tiles.Dequeue(CurrentTile))
 	{
-		ATile* CurrentTile = Tiles.Pop(false);
 
 		if (CurrentTile->HasConflictingReligion(Religion))
 			return CurrentTile;
@@ -338,7 +360,7 @@ ATile* AReligionManager::CalculateNearestEnemyTile(AReligion* Religion)
 		for (auto AdjacentTile : TileManager->GetAdjacentTiles(CurrentTile))
 		{
 			if (!CheckedTiles.Contains(AdjacentTile))
-				Tiles.Add(AdjacentTile);
+				Tiles.Enqueue(AdjacentTile);
 		}
 
 		CheckedTiles.Add(CurrentTile);
@@ -349,14 +371,14 @@ ATile* AReligionManager::CalculateNearestEnemyTile(AReligion* Religion)
 
 ATile* AReligionManager::CalculateNearestEmptyTile(AReligion* Religion)
 {
-	TArray<ATile*> Tiles;
-	TArray<ATile*> CheckedTiles;
+	TQueue<ATile*> Tiles;
+	TSet<ATile*> CheckedTiles;
 
-	Tiles.Add(TileManager->GetTileAtLocation(Religion->GetActorLocation()));
+	Tiles.Enqueue(TileManager->GetTileAtLocation(Religion->GetActorLocation()));
+	ATile* CurrentTile;
 
-	while (Tiles.Num() > 0)
+	while (Tiles.Dequeue(CurrentTile))
 	{
-		ATile* CurrentTile = Tiles.Pop(false);
 
 		if (CurrentTile->GetPopulationOfReligion(Religion) == 0)
 			return CurrentTile;
@@ -364,7 +386,7 @@ ATile* AReligionManager::CalculateNearestEmptyTile(AReligion* Religion)
 		for (auto AdjacentTile : TileManager->GetAdjacentTiles(CurrentTile))
 		{
 			if (!CheckedTiles.Contains(AdjacentTile))
-				Tiles.Add(AdjacentTile);
+				Tiles.Enqueue(AdjacentTile);
 		}
 
 		CheckedTiles.Add(CurrentTile);
