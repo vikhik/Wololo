@@ -1,5 +1,4 @@
-1) Win/Loss condition
+1) Win/Loss condition -> Need UI
 2) Restart UI
 3) Sounds
 4) Tile UI
-5) Look at giving each tile its own target (A* probably useful)
