@@ -14,14 +14,22 @@ AReligionManager::AReligionManager() :
 	ReligionClass = AReligion::StaticClass();
 	TownClass = ATown::StaticClass();
 
-	Colors.Add(FColor::FromHex("B21212"));
-	Colors.Add(FColor::FromHex("FFFC19"));
-	Colors.Add(FColor::FromHex("FF0000"));
-	Colors.Add(FColor::FromHex("1485CC"));
-	Colors.Add(FColor::FromHex("12B212"));
-	Colors.Add(FColor::FromHex("4319FF"));
-	Colors.Add(FColor::FromHex("00FF00"));
-	Colors.Add(FColor::FromHex("CC6514"));
+	Colors.Add(FColor::FromHex("0000A6"));
+	Colors.Add(FColor::FromHex("FFFF00"));
+	Colors.Add(FColor::FromHex("1CE6FF"));
+	Colors.Add(FColor::FromHex("FF34FF"));
+	Colors.Add(FColor::FromHex("FF4A46"));
+	Colors.Add(FColor::FromHex("008941"));
+	Colors.Add(FColor::FromHex("006FA6"));
+	Colors.Add(FColor::FromHex("A30059"));
+	Colors.Add(FColor::FromHex("7A4900"));
+	Colors.Add(FColor::FromHex("63FFAC"));
+	Colors.Add(FColor::FromHex("B79762"));
+	Colors.Add(FColor::FromHex("004D43"));
+	Colors.Add(FColor::FromHex("8FB0FF"));
+	Colors.Add(FColor::FromHex("997D87")); 
+	// 16 nice colours, ish, TODO MAKE BETTER
+	// http://godsnotwheregodsnot.blogspot.ru/2013/11/kmeans-color-quantization-seeding.html
 }
 
 // Called when the game starts or when spawned
