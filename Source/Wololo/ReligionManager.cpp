@@ -116,104 +116,156 @@ void AReligionManager::SpawnReligionInEveryTown()
 	}
 }
 
+struct TileChange
+{
+  TileChange() : type(0), tile(nullptr), religion(nullptr), ratio(0), ritualType(ERitualType::MAX) {}
+  int type;
+
+  ATile *tile;
+  ATile *enemyTile;
+  AReligion *religion;
+  float ratio;
+
+  ERitualType ritualType;
+};
+
 void AReligionManager::RunUpdate()
 {
-	bool DoDebug = false;
-	for (AReligion* Religion : AllReligions)
+  bool DoDebug = false;
+
+  TArray<TileChange> tileChanges;
+
+  for (AReligion* Religion : AllReligions)
+    {
+      ATile* TargetTile;
+      ERitualType RitualType = Religion->GetHighestRitualType();
+
+      if (RitualType == ERitualType::Aggressive)
 	{
-		ATile* TargetTile;
-		ERitualType RitualType = Religion->GetHighestRitualType();
+	  TargetTile = CalculateNearestEnemyTile(Religion);
+	}
+      else
+	{
+	  TargetTile = CalculateNearestEmptyTile(Religion);
+	}
 
-		if (RitualType == ERitualType::Aggressive)
+      for (ATile* Tile : TileManager->Tiles)
+	{
+	  int32 OurPopulation = Tile->GetPopulationOfReligion(Religion);
+
+	  if (OurPopulation > 0)
+	    {
+	      TileChange tileChange;
+			  
+	      bool TileConflicted = Tile->HasConflictingReligion(Religion);
+	      tileChange.tile = Tile;
+	      tileChange.religion = Religion;
+	      tileChange.ritualType = RitualType;
+
+	      if (TileConflicted)
 		{
-			TargetTile = CalculateNearestEnemyTile(Religion);
+		  tileChange.type = 1;
+		  tileChange.enemyTile = Tile;
+		  if (DoDebug) print("Attacking Self");
 		}
-		else
+	      else
 		{
-			TargetTile = CalculateNearestEmptyTile(Religion);
-		}
-
-		for (ATile* Tile : TileManager->Tiles)
-		{
-			int32 OurPopulation = Tile->GetPopulationOfReligion(Religion);
-
-			if (OurPopulation > 0)
+		  auto AdjacentTiles = TileManager->GetAdjacentTiles(Tile);
+			      
+		  ATile* EnemyTile = nullptr;
+			      
+		  for (auto AdjacentTile : AdjacentTiles)
+		    {
+		      if (AdjacentTile->HasConflictingReligion(Religion))
 			{
-				bool TileConflicted = Tile->HasConflictingReligion(Religion);
-
-				if (TileConflicted)
-				{
-					ConsiderAndDoAttack(Tile, Religion, RitualType);
-					if (DoDebug) print("Attacking Self");
-				}
-				else
-				{
-					auto AdjacentTiles = TileManager->GetAdjacentTiles(Tile);
-
-					ATile* EnemyTile = nullptr;
-
-					for (auto AdjacentTile : AdjacentTiles)
-					{
-						if (AdjacentTile->HasConflictingReligion(Religion))
-						{
-							EnemyTile = AdjacentTile;
-							break;
-						}
-					}
-
-					if (EnemyTile != nullptr)
-					{
-						// Adjacent Enemy tile
-
-						if (RitualType != ERitualType::Meditiative)
-						{
-							Tile->MovePopulation(EnemyTile, Religion, Religion->GetAttackRate());
-						}
-						else
-						{
-							// Do Conversion
-						}
-
-						ConsiderAndDoAttack(EnemyTile, Religion, RitualType);
-						if (DoDebug) print("Attacking Adjacent");
-					}
-					else
-					{
-						// No Adjacent Enemy tile
-						ATile* NearbyTileInDirection = TileManager->GetTileInDirection(Tile, TargetTile);
-
-						if (NearbyTileInDirection)
-						{
-							// Move towards target
-							Tile->MovePopulation(NearbyTileInDirection, Religion, Religion->GetMoveRate());
-							if (DoDebug) print("Moving");
-						}
-						else
-						{
-							if (DoDebug) print("Can't Move?");
-						}
-					}
-				}
-				
-				// Now Grow:
-				Tile->Grow(Religion);
-				if (DoDebug) print("Growing");
+			  EnemyTile = AdjacentTile;
+			  break;
 			}
+		    }
+			      
+		  if (EnemyTile != nullptr)
+		    {
+		      // Adjacent Enemy tile
+		      tileChange.enemyTile = EnemyTile;
+				  
+		      if (RitualType != ERitualType::Meditiative)
+			{
+			  tileChange.type = 2;
+			  tileChange.ratio = Religion->GetAttackRate();
+			}
+		      else
+			{
+			  tileChange.type = 3;
+			  // Do Conversion
+			}
+		      
+		      if (DoDebug) print("Attacking Adjacent");
+		    }
+		  else
+		    {
+		      // No Adjacent Enemy tile
+		      ATile* NearbyTileInDirection = TileManager->GetTileInDirection(Tile, TargetTile);
+				  
+		      if (NearbyTileInDirection)
+			{
+			  tileChange.type = 4;
+			  tileChange.enemyTile = NearbyTileInDirection;
+			  tileChange.ratio = Religion->GetMoveRate();
+			  // Move towards target
+			  if (DoDebug) print("Moving");
+			}
+		      else
+			{
+			  if (DoDebug) print("Can't Move?");
+			}
+		    }
 		}
-
-		DoDebug = false;
+				
+	      // Now Grow:
+	      //Tile->Grow(Religion);
+	      tileChanges.Add(tileChange);
+	      if (DoDebug) print("Growing");
+	    }
 	}
 
-	// 4. Housekeeping
-	for (AReligion* Religion : AllReligions)
+      DoDebug = false;
+    }
+
+  //4. Commit changes
+  for (TileChange& tileChange : tileChanges)
+    {
+      switch (tileChange.type)
 	{
-		Religion->Followers = 0;
+	case 0:
+	  break;
+	case 1:
+	  ConsiderAndDoAttack(tileChange.enemyTile, tileChange.religion, tileChange.ritualType);
+	  break;
+	case 2:
+	  tileChange.tile->MovePopulation(tileChange.enemyTile, tileChange.religion, tileChange.ratio);
+	  ConsiderAndDoAttack(tileChange.enemyTile, tileChange.religion, tileChange.ritualType);
+	  break;
+	case 3:
+	  ConsiderAndDoAttack(tileChange.enemyTile, tileChange.religion, tileChange.ritualType);
+	  break;
+	case 4:
+	  tileChange.tile->MovePopulation(tileChange.enemyTile, tileChange.religion, tileChange.ratio);
+	  break;
+	};
 
-		for (ATile* Tile : TileManager->Tiles)
-		{
-			Religion->Followers += Tile->GetPopulationOfReligion(Religion);
-		}
+      tileChange.tile->Grow(tileChange.religion);
+    }
+	
+  // 5. Housekeeping
+  for (AReligion* Religion : AllReligions)
+    {
+      Religion->Followers = 0;
+
+      for (ATile* Tile : TileManager->Tiles)
+	{
+	  Religion->Followers += Tile->GetPopulationOfReligion(Religion);
 	}
+    }
 }
 
 void AReligionManager::ConsiderAndDoAttack(ATile* Tile, AReligion* Religion, ERitualType RitualType)
