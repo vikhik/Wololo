@@ -35,9 +35,6 @@ public:
 		bool IsEmpty();
 
 	UFUNCTION(BlueprintPure, Category = "Tiles")
-		AReligion* ReadyToSpread(); // Returns nullptr if false
-
-	UFUNCTION(BlueprintPure, Category = "Tiles")
 		TArray<AReligion*> GetReligions();
 
 	UFUNCTION(BlueprintPure, Category = "Tiles")
@@ -60,6 +57,11 @@ public:
 
 	TMap<AReligion*, int32> GetPopulationByReligion();
 
+	void Attack(AReligion* Religion, AReligion* TargetReligion);
+	void Convert(AReligion* Religion);
+	void MovePopulation(ATile* EnemyTile, AReligion* Religion, float Ratio);
+	void Grow(AReligion* Religion);
+	static float ConversionRate;
 private:
 	TMap<AReligion*, int32> Population;
 };

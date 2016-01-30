@@ -61,7 +61,40 @@ void ATileManager::SpawnTilesAndTowns()
 
 ATile* ATileManager::GetTileInDirection(ATile* Source, ATile* Target)
 {
-	return nullptr;
+	FVector SourceLoc = Source->GetActorLocation();
+	FVector TargetLoc = Target->GetActorLocation();
+
+	float xdiff = TargetLoc.X - SourceLoc.X;
+	float ydiff = TargetLoc.Y - SourceLoc.Y;
+
+	FVector ReturnTileLocation = SourceLoc;
+
+	if (FMath::Abs(xdiff) > FMath::Abs(ydiff))
+	{
+		if (xdiff > 0)
+		{
+			ReturnTileLocation.X += TileWidth;
+		}
+		else
+		{
+			ReturnTileLocation.X -= TileWidth;
+		}
+	}
+	else
+	{
+		if (ydiff > 0)
+		{
+			ReturnTileLocation.Y += TileHeight;
+		}
+		else
+		{
+			ReturnTileLocation.Y -= TileHeight;
+		}
+	}
+
+	auto ReturnTile = GetTileAtLocation(ReturnTileLocation);
+
+	return ReturnTile;
 }
 
 ATile* ATileManager::SpawnTileAtLocation(FVector Location)

@@ -55,6 +55,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Religion")
 		void RunUpdate();
 
+	void ConsiderAndDoAttack(ATile* Tile, AReligion* Religion, ERitualType RitualType);
+
 private:
 	FColor GenerateNewColor();
+	ATile* CalculateNearestEnemyTile(AReligion* Religion);
+	ATile* CalculateNearestEmptyTile(AReligion* Religion);
 };

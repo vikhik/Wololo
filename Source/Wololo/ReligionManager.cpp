@@ -118,145 +118,90 @@ void AReligionManager::SpawnReligionInEveryTown()
 
 void AReligionManager::RunUpdate()
 {
-	// 1. Spread
-	for (ATile* Tile : TileManager->Tiles)
+	bool DoDebug = true;
+	for (AReligion* Religion : AllReligions)
 	{
-		// if A single Religion has 80%+ and over 200 pop
-		AReligion* SpreadReligion = Tile->ReadyToSpread();
+		ATile* TargetTile;
+		ERitualType RitualType = Religion->GetHighestRitualType();
 
-		if (SpreadReligion)
+		if (RitualType == ERitualType::Aggressive)
 		{
-			auto AdjacentTiles = TileManager->GetAdjacentTiles(Tile);
-
-			auto RandomIndex = FMath::RandRange(0, AdjacentTiles.Num() - 1);
-
-			auto RandomTile = AdjacentTiles[RandomIndex];
-
-			auto SpreadPop = Tile->GetPopulationOfReligion(SpreadReligion) * SpreadReligion->GetSpreadRate();
-			auto TargetPop = RandomTile->GetPopulationOfReligion(SpreadReligion); 
-			SpreadPop -= TargetPop;
-
-			if (SpreadPop > 0) // Only spread if spreadpop is higher than existing pop
-			{
-				RandomTile->AddPopulation(SpreadReligion, SpreadPop);
-				Tile->AddPopulation(SpreadReligion, -SpreadPop); // MOVE the population
-			}
+			TargetTile = CalculateNearestEnemyTile(Religion);
 		}
-	}
-
-	// 2. Conflict
-	for (ATile* Tile : TileManager->Tiles)
-	{
-		auto Religions = Tile->GetReligions();
-
-		if (Religions.Num() > 1)
+		else
 		{
-			// lowest pop first
-			auto Population = Tile->GetPopulationByReligion();
-			Population.ValueSort([](int32 PopA, int32 PopB) {
-				return PopA < PopB;
-			});
+			TargetTile = CalculateNearestEmptyTile(Religion);
+		}
 
-			TMap<AReligion*, int32> PopulationChange;
+		for (ATile* Tile : TileManager->Tiles)
+		{
+			int32 OurPopulation = Tile->GetPopulationOfReligion(Religion);
 
-			for (auto ReligiousPopulation : Population)
+			if (OurPopulation > 0)
 			{
-				for (auto OtherPopulation : Population)
+				bool TileConflicted = Tile->HasConflictingReligion(Religion);
+
+				if (TileConflicted)
 				{
-					// for each other pop
-					// our pop * offense - their pop * defense = their pop change (max 0)
+					ConsiderAndDoAttack(Tile, Religion, RitualType);
+					if (DoDebug) print("Attacking Self");
+				}
+				else
+				{
+					auto AdjacentTiles = TileManager->GetAdjacentTiles(Tile);
 
-					if (ReligiousPopulation != OtherPopulation)
+					ATile* EnemyTile = nullptr;
+
+					for (auto AdjacentTile : AdjacentTiles)
 					{
-						// Offense vs Defense
-
-						int32 PotentialDeaths = ReligiousPopulation.Value * ReligiousPopulation.Key->GetConflictOffense();
-						int32 SavedLives = OtherPopulation.Value * OtherPopulation.Key->GetConflictDefense();
-
-						int32 ActualDeaths = PotentialDeaths - SavedLives;
-
-						if (ActualDeaths > 0)
+						if (AdjacentTile->HasConflictingReligion(Religion))
 						{
-							if (!PopulationChange.Contains(OtherPopulation.Key))
-							{
-								PopulationChange.Add(OtherPopulation.Key);
-							}
+							EnemyTile = AdjacentTile;
+							break;
+						}
+					}
 
-							PopulationChange[OtherPopulation.Key] -= ActualDeaths;
+					if (EnemyTile != nullptr)
+					{
+						// Adjacent Enemy tile
 
-							//print("Deaths : " + FString::FromInt(ActualDeaths));
+						if (RitualType != ERitualType::Meditiative)
+						{
+							Tile->MovePopulation(EnemyTile, Religion, Religion->GetAttackRate());
 						}
 						else
 						{
-							//print("Fully Defended");
+							// Do Conversion
 						}
 
-						// Conversion
+						ConsiderAndDoAttack(EnemyTile, Religion, RitualType);
+						if (DoDebug) print("Attacking Adjacent");
+					}
+					else
+					{
+						// No Adjacent Enemy tile
+						ATile* NearbyTileInDirection = TileManager->GetTileInDirection(Tile, TargetTile);
 
-						int32 PotentialConverts = OtherPopulation.Value * ReligiousPopulation.Key->GetConflictConversion();
-
-						if (PotentialConverts > 0)
+						if (NearbyTileInDirection)
 						{
-							if (!PopulationChange.Contains(ReligiousPopulation.Key))
-							{
-								PopulationChange.Add(ReligiousPopulation.Key);
-							}
-
-							if (!PopulationChange.Contains(OtherPopulation.Key))
-							{
-								PopulationChange.Add(OtherPopulation.Key);
-							}
-
-							PopulationChange[ReligiousPopulation.Key] += PotentialConverts;
-							PopulationChange[OtherPopulation.Key] -= PotentialConverts;
-
-							//print("Conversions: " + FString::FromInt(PotentialConverts));
+							// Move towards target
+							Tile->MovePopulation(NearbyTileInDirection, Religion, Religion->GetMoveRate());
+							if (DoDebug) print("Moving");
+						}
+						else
+						{
+							if (DoDebug) print("Can't Move?");
 						}
 					}
 				}
+				
+				// Now Grow:
+				Tile->Grow(Religion);
+				if (DoDebug) print("Growing");
 			}
 		}
-	}
 
-	// 3. Growth
-	for (ATile* Tile : TileManager->Tiles)
-	{
-		int32 NumReligiousTiles = 0;
-
-		for (auto ReligiousPopulation : Tile->GetPopulationByReligion())
-		{
-			NumReligiousTiles++;
-
-			float GrowthRate = ReligiousPopulation.Key->GetGrowthRate();
-
-			float PopMaxRatio = ReligiousPopulation.Value / ReligiousPopulation.Key->GetGrowthMax();
-
-			if (PopMaxRatio < 0.5)
-			{
-				GrowthRate *= 1.0;
-			}
-			else if (PopMaxRatio < 0.75)
-			{
-				GrowthRate *= 0.5;
-			}
-			else if (PopMaxRatio < 1.0)
-			{
-				GrowthRate *= 0.25;
-			}
-			else
-			{
-				GrowthRate = 0.f;
-			}
-
-			int32 GrowthAmount = ReligiousPopulation.Value * GrowthRate;
-
-			if (GrowthAmount > 0)
-			{
-				Tile->AddPopulation(ReligiousPopulation.Key, GrowthAmount);
-
-				//print("Growth: " + FString::FromInt(GrowthAmount));
-			}
-		}
+		DoDebug = false;
 	}
 
 	// 4. Housekeeping
@@ -271,11 +216,108 @@ void AReligionManager::RunUpdate()
 	}
 }
 
+void AReligionManager::ConsiderAndDoAttack(ATile* Tile, AReligion* Religion, ERitualType RitualType)
+{
+	// Figure out target
+	AReligion* TargetReligion = nullptr;
+
+	for (auto OtherReligion : Tile->GetReligions())
+	{
+		if (Religion != OtherReligion)
+		{
+			TargetReligion = OtherReligion;
+			break;
+		}
+	}
+
+	if (TargetReligion == nullptr) 
+		return; // ERROR? SHOULD NEVER HAPPEN
+
+	int32 OurPopulation = Tile->GetPopulationOfReligion(Religion);
+	int32 TheirPopulation = Tile->GetPopulationOfReligion(TargetReligion);
+
+	// Consider Battle
+	bool WantToBattle = false;
+
+	switch (RitualType)
+	{
+	case ERitualType::Aggressive:
+		if (OurPopulation >= TheirPopulation * 1.5)
+			WantToBattle = true;
+		break;
+
+	case ERitualType::Communal:
+		if (OurPopulation >= TheirPopulation * 3)
+			WantToBattle = true;
+		break;
+
+	case ERitualType::Meditiative:
+		Tile->Convert(Religion);
+		return;
+	}
+
+	// Do Battle
+	if (WantToBattle)
+		Tile->Attack(Religion, TargetReligion);
+}
+
 FColor AReligionManager::GenerateNewColor()
 {
 	FVector RandVec = FMath::VRand();
 	FColor NewColor = FLinearColor(RandVec).ToFColor(false);
 
 	return NewColor;
+}
+
+ATile* AReligionManager::CalculateNearestEnemyTile(AReligion* Religion)
+{
+	TArray<ATile*> Tiles;
+	TArray<ATile*> CheckedTiles;
+
+	Tiles.Add(TileManager->GetTileAtLocation(Religion->GetActorLocation()));
+
+	while (Tiles.Num() > 0)
+	{
+		ATile* CurrentTile = Tiles.Pop(false);
+
+		if (CurrentTile->HasConflictingReligion(Religion))
+			return CurrentTile;
+
+		for (auto AdjacentTile : TileManager->GetAdjacentTiles(CurrentTile))
+		{
+			if (!CheckedTiles.Contains(AdjacentTile))
+				Tiles.Add(AdjacentTile);
+		}
+
+		CheckedTiles.Add(CurrentTile);
+	}
+
+	return nullptr;
+}
+
+ATile* AReligionManager::CalculateNearestEmptyTile(AReligion* Religion)
+{
+	TArray<ATile*> Tiles;
+	TArray<ATile*> CheckedTiles;
+
+	Tiles.Add(TileManager->GetTileAtLocation(Religion->GetActorLocation()));
+
+	while (Tiles.Num() > 0)
+	{
+		ATile* CurrentTile = Tiles.Pop(false);
+
+		if (CurrentTile->GetPopulationOfReligion(Religion) == 0)
+			return CurrentTile;
+
+		for (auto AdjacentTile : TileManager->GetAdjacentTiles(CurrentTile))
+		{
+			if (!CheckedTiles.Contains(AdjacentTile))
+				Tiles.Add(AdjacentTile);
+		}
+
+		CheckedTiles.Add(CurrentTile);
+	}
+
+	return nullptr;
 }
 

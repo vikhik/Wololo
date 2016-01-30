@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "RitualData.h"
-
 class WOLOLO_API RitualManager
 {
 private:	
@@ -15,6 +13,4 @@ protected:
 public:
 	static RitualManager *GetInstance();
 	static void Destroy();
-
-	TMap<ERitualType, FRitualData> RitualMap;
 };

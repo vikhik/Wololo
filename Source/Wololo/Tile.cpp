@@ -3,6 +3,7 @@
 #include "Wololo.h"
 #include "Tile.h"
 
+float ATile::ConversionRate = 1 / 3;
 
 // Sets default values
 ATile::ATile()
@@ -30,13 +31,10 @@ bool ATile::HasConflictingReligion(AReligion* Religion)
 {
 	auto Religions = GetReligions();
 
-	if (Religions.Contains(Religion) && Religions.Num() > 1)
+	for (auto OtherReligion : Religions)
 	{
-		return true;
-	}
-	else if (Religions.Num() > 0)
-	{
-		return true;
+		if (OtherReligion != Religion)
+			return true;
 	}
 
 	return false;
@@ -45,20 +43,6 @@ bool ATile::HasConflictingReligion(AReligion* Religion)
 bool ATile::IsEmpty()
 {
 	return GetPopulation() == 0;
-}
-
-AReligion* ATile::ReadyToSpread()
-{
-	for (auto Religion : GetReligions())
-	{
-		if (GetReligiousPercentage(Religion) > Religion->GetSpreadMinimumPercentage()
-			&& GetPopulationOfReligion(Religion) > Religion->GetSpreadMinimumPopulation())
-		{
-			return Religion;
-		}
-	}
-
-	return nullptr;
 }
 
 TArray<AReligion*> ATile::GetReligions()
@@ -107,6 +91,57 @@ TMap<AReligion*, int32> ATile::GetPopulationByReligion()
 	{
 		return Population;
 	}
+}
+
+void ATile::Attack(AReligion* Religion, AReligion* TargetReligion)
+{
+	int32 Attackers = GetPopulationOfReligion(Religion);
+	int32 Defenders = GetPopulationOfReligion(TargetReligion);
+
+	int32 Deaths = FMath::Min(Attackers, Defenders);
+
+	AddPopulation(Religion, -Deaths);
+	AddPopulation(TargetReligion, -Deaths);
+}
+
+void ATile::Convert(AReligion* Religion)
+{
+	for (auto OtherReligion : GetReligions())
+	{
+		int32 Audience = GetPopulationOfReligion(OtherReligion);
+		int32 Converted = Audience * ATile::ConversionRate;
+
+		AddPopulation(OtherReligion, -Converted);
+		AddPopulation(Religion, Converted);
+	}
+}
+
+void ATile::MovePopulation(ATile* TargetTile, AReligion* Religion, float Ratio)
+{
+	int32 TotalPop = GetPopulationOfReligion(Religion);
+
+	int32 Segment = TotalPop * Ratio;
+
+	AddPopulation(Religion, -Segment);
+	TargetTile->AddPopulation(Religion, Segment);
+}
+
+void ATile::Grow(AReligion* Religion)
+{
+	int32 CurrentPop = GetPopulationOfReligion(Religion);
+
+	int32 GrowthAmount = CurrentPop * Religion->GetGrowthRate();
+
+	if (CurrentPop >= Religion->GetGrowthCap())
+	{
+		return;
+	}
+	else if (CurrentPop + GrowthAmount >= Religion->GetGrowthCap())
+	{
+		GrowthAmount = Religion->GetGrowthCap() - CurrentPop;
+	}
+
+	AddPopulation(Religion, GrowthAmount);
 }
 
 int32 ATile::GetPopulation()

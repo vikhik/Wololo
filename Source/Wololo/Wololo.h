@@ -8,7 +8,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogWololo, Log, All);
 
-#define print(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White,text)
+#define print(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.0, FColor::White,text)
 
 
 #endif

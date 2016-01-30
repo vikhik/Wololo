@@ -25,44 +25,35 @@ void AReligion::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 }
 
-float AReligion::GetSpreadMinimumPercentage() const
+float AReligion::GetAttackRate() const
 {
-	return ReligiousRitual.SpreadMinimumPercentage;
+	switch (GetHighestRitualType())
+	{
+	case ERitualType::Aggressive:
+	case ERitualType::Communal:
+		return 2.f / 3.f;
+	case ERitualType::Meditiative:
+		return 0;
+	}
+	return 2.f / 3.f;
 }
 
-int32 AReligion::GetSpreadMinimumPopulation() const
+float AReligion::GetMoveRate() const
 {
-	return ReligiousRitual.SpreadMinimumPopulation;
-}
-
-float AReligion::GetSpreadRate() const
-{
-	return ReligiousRitual.SpreadRate;
+	switch (GetHighestRitualType())
+	{
+	case ERitualType::Aggressive:
+	case ERitualType::Communal:
+		return 1.f / 2.f;
+	case ERitualType::Meditiative:
+		return 1.f / 3.f;
+	}
+	return 1.f / 2.f;
 }
 
 float AReligion::GetGrowthRate() const
 {
-	return ReligiousRitual.GrowthRate;
-}
-
-float AReligion::GetGrowthMax() const
-{
-	return ReligiousRitual.GrowthMax;
-}
-
-float AReligion::GetConflictOffense() const
-{
-	return ReligiousRitual.ConflictOffense;
-}
-
-float AReligion::GetConflictDefense() const
-{
-	return ReligiousRitual.ConflictDefense;
-}
-
-float AReligion::GetConflictConversion() const
-{
-	return ReligiousRitual.ConflictConversion;
+	return 1.f / 10.f;
 }
 
 ERitualType AReligion::GetHighestRitualType() const
@@ -125,15 +116,6 @@ void AReligion::SetNewType(ERitualType Type)
 void AReligion::UpdateRitualData()
 {
 	CleanUpInfluences();
-
-	ReligiousRitual.Zero();
-
-	for (auto Influence : RitualInfluences)
-	{
-		FRitualData RitualData = RitualManager::GetInstance()->RitualMap[Influence.Key];
-
-		ReligiousRitual.Add(RitualData, Influence.Value);
-	}
 }
 
 void AReligion::CleanUpInfluences()
@@ -152,5 +134,10 @@ void AReligion::SetFromVec(FVector ToUse)
 	RitualInfluences.Add(ERitualType::Aggressive, ToUse.X);
 	RitualInfluences.Add(ERitualType::Communal, ToUse.Y);
 	RitualInfluences.Add(ERitualType::Meditiative, ToUse.Z);
+}
+
+int32 AReligion::GetGrowthCap()
+{
+	return 5000;
 }
 

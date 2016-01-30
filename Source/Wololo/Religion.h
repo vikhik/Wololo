@@ -4,7 +4,6 @@
 
 #include "GameFramework/Actor.h"
 #include "RitualData.h"
-#include "RitualManager.h"
 #include "Religion.generated.h"
 
 UCLASS()
@@ -25,28 +24,16 @@ public:
 	// TRAIT VALUES
 
 	UFUNCTION(BlueprintPure, Category = "Religion")
-		float GetSpreadMinimumPercentage() const;
+		float GetAttackRate() const;
 
 	UFUNCTION(BlueprintPure, Category = "Religion")
-		int32 GetSpreadMinimumPopulation() const;
-
-	UFUNCTION(BlueprintPure, Category = "Religion")
-		float GetSpreadRate() const;
+		float GetMoveRate() const;
 
 	UFUNCTION(BlueprintPure, Category = "Religion")
 		float GetGrowthRate() const;
 
 	UFUNCTION(BlueprintPure, Category = "Religion")
-		float GetGrowthMax() const;
-
-	UFUNCTION(BlueprintPure, Category = "Religion")
-		float GetConflictOffense() const;
-
-	UFUNCTION(BlueprintPure, Category = "Religion")
-		float GetConflictDefense() const;
-
-	UFUNCTION(BlueprintPure, Category = "Religion")
-		float GetConflictConversion() const;
+		int32 GetGrowthCap();
 
 	UFUNCTION(BlueprintPure, Category = "Religion")
 		ERitualType GetHighestRitualType() const;
@@ -78,9 +65,6 @@ public:
 		void SetNewType(ERitualType Type);
 
 	void UpdateRitualData();
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FRitualData ReligiousRitual;
 
 private:
 	void CleanUpInfluences();
