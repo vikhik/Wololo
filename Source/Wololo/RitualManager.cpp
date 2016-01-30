@@ -16,8 +16,8 @@ RitualManager::RitualManager()
 			0.5f,	// Spread Rate (how much of the current population MOVES to the next tile)
 			0.05f,	// Growth Rate (Compound interest on Population)
 			2000,	// Growth Max
-			5.0f,	// Conflict Offense (% of population that potentially kill)
-			0.5f,	// Conflict Defense (% of population that ignores kills)
+			10.0f,	// Conflict Offense (% of population that potentially kill)
+			1.0f,	// Conflict Defense (% of population that ignores kills)
 			0.15f	// Conflict Conversion (% of pop converted from the enemy)
 			));
 
@@ -28,8 +28,8 @@ RitualManager::RitualManager()
 			0.3f, 
 			0.02f, 
 			6000,
-			2.0f, 
-			2.0f,
+			4.0f, 
+			4.0f,
 			0.2f
 			));
 
@@ -40,8 +40,8 @@ RitualManager::RitualManager()
 			0.2f, 
 			0.035f, 
 			4000,
-			2.0f, 
-			3.0f,
+			4.0f, 
+			6.0f,
 			0.1f
 			));
 }
