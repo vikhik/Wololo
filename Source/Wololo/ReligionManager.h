@@ -7,6 +7,9 @@
 #include "TileManager.h"
 #include "ReligionManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerWon);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerLost);
+
 UCLASS()
 class WOLOLO_API AReligionManager : public AActor
 {
@@ -21,6 +24,12 @@ public:
 	
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
+
+	UPROPERTY(BlueprintAssignable)
+		FPlayerWon OnPlayerWon;
+
+	UPROPERTY(BlueprintAssignable)
+		FPlayerLost OnPlayerLost;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<FColor> Colors;

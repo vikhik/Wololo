@@ -336,6 +336,7 @@ void AReligionManager::RunUpdate()
 
 			// IF RELIGION 1
 			// GAME OVER FOR PLAYER
+			OnPlayerLost.Broadcast();
 		}
 		else if (!Religion->OwnedTiles.Contains(Religion->BaseTile))
 		{
@@ -358,6 +359,7 @@ void AReligionManager::RunUpdate()
 	if (AllReligions.Num() == 1)
 	{
 		// LAST RELIGION, PLAYER WINS
+		OnPlayerWon.Broadcast();
 	}
 
 	// TODO: POPULATION % VICTORY (minimum 50,000)
