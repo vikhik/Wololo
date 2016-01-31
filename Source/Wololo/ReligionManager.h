@@ -8,7 +8,7 @@
 #include "ReligionManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerWon);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerLost);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerLost, AReligion*, LostReligion);
 
 UCLASS()
 class WOLOLO_API AReligionManager : public AActor

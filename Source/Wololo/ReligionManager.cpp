@@ -336,7 +336,7 @@ void AReligionManager::RunUpdate()
 
 			// IF RELIGION 1
 			// GAME OVER FOR PLAYER
-			OnPlayerLost.Broadcast();
+			OnPlayerLost.Broadcast(Religion);
 		}
 		else if (!Religion->OwnedTiles.Contains(Religion->BaseTile))
 		{
