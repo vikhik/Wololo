@@ -71,6 +71,7 @@ public:
 
 	TSet<AActor*> OwnedTiles;
 	TSet<AActor*> BorderTiles;
+	AActor* BaseTile;
 
 private:
 	void CleanUpInfluences();

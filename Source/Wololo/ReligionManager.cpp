@@ -337,6 +337,15 @@ void AReligionManager::RunUpdate()
 			// IF RELIGION 1
 			// GAME OVER FOR PLAYER
 		}
+		else if (!Religion->OwnedTiles.Contains(Religion->BaseTile))
+		{
+			for (auto OtherBase : Religion->OwnedTiles)
+			{
+				Religion->BaseTile = OtherBase;
+				Religion->SetActorLocation(OtherBase->GetActorLocation());
+				break;
+			}
+		}
 	}
 
 	for (AReligion* Religion : ReligionsToRemove)

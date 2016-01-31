@@ -140,7 +140,18 @@ void ATile::Convert(AReligion* Religion)
 		int32 Converted = Audience * ATile::ConversionRate;
 
 		AddPopulation(OtherReligion, -Converted);
-		AddPopulation(Religion, Converted);
+
+		int32 CurrentPop = GetPopulationOfReligion(Religion);
+		int32 MaxPop = Religion->GetGrowthCap();
+
+		if (CurrentPop + Converted >= MaxPop)
+		{
+			Converted = MaxPop - CurrentPop;
+		}
+		if (Converted > 0)
+		{
+			AddPopulation(Religion, Converted);
+		}
 	}
 }
 
@@ -160,16 +171,32 @@ void ATile::MovePopulation(ATile* EnemyTile, AReligion* Religion, float Ratio, i
 void ATile::Grow(AReligion* Religion)
 {
 	int32 CurrentPop = GetPopulationOfReligion(Religion);
+	int32 MaxPop = Religion->GetGrowthCap();
 
-	int32 GrowthAmount = CurrentPop * Religion->GetGrowthRate();
+	float GrowthRate = Religion->GetGrowthRate();
+
+	if (CurrentPop > MaxPop)
+	{
+		return;
+	}
+	else if (CurrentPop > MaxPop * 0.75)
+	{
+		GrowthRate /= 4;
+	}
+	else if (CurrentPop > MaxPop * 0.5)
+	{
+		GrowthRate /= 2;
+	}
+
+	int32 GrowthAmount = CurrentPop * GrowthRate;
 
 	if (CurrentPop >= Religion->GetGrowthCap())
 	{
 		return;
 	}
-	else if (CurrentPop + GrowthAmount >= Religion->GetGrowthCap())
+	else if (CurrentPop + GrowthAmount >= MaxPop)
 	{
-		GrowthAmount = Religion->GetGrowthCap() - CurrentPop;
+		GrowthAmount = MaxPop - CurrentPop;
 	}
 
 	AddPopulation(Religion, GrowthAmount);
