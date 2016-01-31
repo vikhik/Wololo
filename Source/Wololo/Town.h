@@ -30,7 +30,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
 		void AddPopulation(AReligion* Religion, int32 AddedPop);
 
-	UFUNCTION(BlueprintCallable, Category = "Tiles")
+	UFUNCTION(BlueprintPure, Category = "Tiles")
 		AReligion* GetStrongestReligion();
 
 	UFUNCTION(BlueprintPure, Category = "Tiles")

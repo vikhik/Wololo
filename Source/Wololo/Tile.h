@@ -58,6 +58,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
 		void SetWidthAndHeight(float NewWidth, float NewHeight);
 
+	UFUNCTION(BlueprintPure, Category = "Tiles")
+		AReligion* GetStrongestReligion();
+
 	TMap<AReligion*, int32> GetPopulationByReligion();
 
 	void Attack(AReligion* Religion, AReligion* TargetReligion);

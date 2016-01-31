@@ -98,6 +98,23 @@ void ATile::SetWidthAndHeight(float NewWidth, float NewHeight)
 	this->Height = NewHeight;
 }
 
+AReligion* ATile::GetStrongestReligion()
+{
+	int32 HighestPop = 0;
+	AReligion* HighestReligion = 0;
+
+	for (auto Religion : GetReligions())
+	{
+		if (GetPopulationOfReligion(Religion) > HighestPop)
+		{
+			HighestPop = GetPopulationOfReligion(Religion);
+			HighestReligion = Religion;
+		}
+	}
+
+	return HighestReligion;
+}
+
 TMap<AReligion*, int32> ATile::GetPopulationByReligion()
 {
 	// TODO: If we ever spawn Towns later...
