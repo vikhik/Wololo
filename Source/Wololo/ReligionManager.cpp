@@ -102,6 +102,7 @@ void AReligionManager::SpawnReligionInEveryTown()
 
 		ATile* Tile = ((ATile*)TilesWithTowns[i]);
 		Tile->AddPopulation(Religion, RandomPop);
+		Religion->Followers = 500;
 
 		if (i >= Colors.Num())
 		{
