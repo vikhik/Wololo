@@ -5,3 +5,7 @@ Intermediate/
 *.VC.opendb
 Build/
 Packaged/
+Binaries/Mac/UE4Editor-Wololo-1259.dSYM
+Binaries/Mac/UE4Editor-Wololo-1259.dylib
+Binaries/Mac/UE4Editor-Wololo-3561.dylib
+Binaries/Mac/UE4Editor-Wololo-9053.dylib
